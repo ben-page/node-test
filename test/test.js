@@ -172,15 +172,6 @@ function suite1() {
         testsComplete++;
     });
     
-    suite.test('t.lessThanOrEqual()', t => {
-        testsCreated++;
-        t.lessThanOrEqual(5, 5);
-        assert.throws(() => {
-            t.lessThanOrEqual(5, 1);
-        });
-        testsComplete++;
-    });
-    
     suite.after(() => {
         assert.strictEqual(afterAll, false);
         assert.strictEqual(beforeAll, true);
@@ -290,6 +281,6 @@ function suite4() {
 }
 
 suite1();
-// suite2();
-// suite3();
-// suite4();
+suite2();
+suite3();
+suite4();
