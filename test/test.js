@@ -18,15 +18,6 @@ function suite1() {
         assert.strictEqual(testsComplete, 0);
     });
     
-    // suite.test('asynchronous test', t => {
-    //     testsCreated++;
-    //     return Promise.delay(2000)
-    //         .then(() => {
-    //             testsComplete++;
-    //             asynchronousComplete = true;
-    //         });
-    // });
-    
     suite.test('t.is() pass', t => {
         testsCreated++;
         t.is(1, 1);
@@ -235,7 +226,49 @@ function suite3() {
     });
 }
 
+function suite4() {
+    const suite = new Suite('asynchronous & serial');
+    
+    let testsCreated = 0;
+    let testsComplete = 0;
+    
+    suite.test('asynchronous test', t => {
+        testsCreated++;
+        return Promise.delay(10)
+            .then(() => {
+                testsComplete++;
+                assert.strictEqual(testsCreated, 3);
+                assert.strictEqual(testsComplete, 3);
+            });
+    });
+    
+    suite.serial.test('serial 1', t => {
+        testsCreated++;
+        return Promise.delay(300)
+            .then(() => {
+                testsComplete++;
+                assert.strictEqual(testsCreated, 1);
+                assert.strictEqual(testsComplete, 1);
+            });
+    });
+    
+    suite.serial.test('serial 2', t => {
+        testsCreated++;
+        return Promise.delay(100)
+            .then(() => {
+                testsComplete++;
+                assert.strictEqual(testsCreated, 2);
+                assert.strictEqual(testsComplete, 2);
+            });
+    });
+
+    suite.after(() => {
+        assert.strictEqual(testsCreated, 3);
+        assert.strictEqual(testsComplete, 3);
+    });
+}
 
 suite1();
 suite2();
 suite3();
+suite4();
