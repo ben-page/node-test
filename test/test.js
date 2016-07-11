@@ -202,7 +202,7 @@ function suite3() {
         return { init: true };
     });
     
-    suite.afterEach(state => {
+    suite.afterEach((t, state) => {
         state.complete = true;
     });
     
