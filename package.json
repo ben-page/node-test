@@ -1,0 +1,16 @@
+{
+  "name": "node-test",
+  "version": "0.0.0",
+  "description": "Simple, unobstrusive test runner",
+  "main": "index.js",
+  "scripts": {
+    "test": "test/test.js"
+  },
+  "repository": "ben-page/node-test",
+  "author": "Ben Page <ben.page@openreign.com>",
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "^3.4.1",
+    "not-so-shallow": "^0.1.3"
+  }
+}
