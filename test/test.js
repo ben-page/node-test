@@ -18,15 +18,12 @@ function suite1() {
         assert.strictEqual(testsComplete, 0);
     });
     
-    suite.test('t.is() pass', t => {
+    suite.test('t.is()', t => {
         testsCreated++;
         t.is(1, 1);
-        testsComplete++;
-    });
-    
-    suite.failing('t.is() fail', t => {
-        testsCreated++;
-        t.is(1, 5);
+        assert.throws(() => {
+            t.is(1, 5);
+        });
         testsComplete++;
     });
     
@@ -44,67 +41,52 @@ function suite1() {
         testsComplete++;
     });
     
-    suite.test('t.not() pass', t => {
+    suite.test('t.not()', t => {
         testsCreated++;
         t.not(1, 5);
+        assert.throws(() => {
+            t.not(1, 1);
+        });
         testsComplete++;
     });
     
-    suite.failing('t.not() fail', t => {
-        testsCreated++;
-        t.not(1, 1);
-        testsComplete++;
-    });
-    
-    suite.test('t.true() pass', t => {
+    suite.test('t.true()', t => {
         testsCreated++;
         t.true(true);
+        assert.throws(() => {
+            t.true(false);
+        });
         testsComplete++;
     });
     
-    suite.failing('t.true() fail', t => {
-        testsCreated++;
-        t.true(false);
-        testsComplete++;
-    });
-    
-    suite.test('t.false() pass', t => {
+    suite.test('t.false()', t => {
         testsCreated++;
         t.false(false);
+        assert.throws(() => {
+            t.false(true);
+        });
         testsComplete++;
     });
     
-    suite.failing('t.false() fail', t => {
-        testsCreated++;
-        t.false(true);
-        testsComplete++;
-    });
-    
-    suite.test('t.truthy() pass', t => {
+    suite.test('t.truthy()', t => {
         testsCreated++;
         t.truthy(1);
+        assert.throws(() => {
+            t.truthy(0);
+        });
         testsComplete++;
     });
     
-    suite.failing('t.truthy() fail', t => {
-        testsCreated++;
-        t.truthy(0);
-        testsComplete++;
-    });
-    
-    suite.test('t.falsey() pass', t => {
+    suite.test('t.falsey()', t => {
         testsCreated++;
         t.falsey(0);
+        assert.throws(() => {
+            t.falsey(1);
+        });
         testsComplete++;
     });
     
-    suite.failing('t.falsey() fail', t => {
-        testsCreated++;
-        t.falsey(1);
-        testsComplete++;
-    });
-    
-    suite.test('t.deepEqual() pass', t => {
+    suite.test('t.deepEqual()', t => {
         testsCreated++;
         t.deepEqual(
             {
@@ -123,48 +105,87 @@ function suite1() {
                     ]
                 }
             });
+        assert.throws(() => {
+            t.deepEqual(
+                {
+                    a: {
+                        b: 123,
+                        c: [
+                            new Date(2016, 1, 1, 1, 1, 1)
+                        ]
+                    }
+                },
+                {
+                    a: {
+                        b: 1234,
+                        c: [
+                            new Date(2016, 1, 1, 1, 1, 1)
+                        ]
+                    }
+                });
+        });
         testsComplete++;
     });
     
-    suite.failing('t.deepEqual() fail', t => {
-        testsCreated++;
-        t.deepEqual(
-            {
-                a: {
-                    b: 123,
-                    c: [
-                        new Date(2016, 1, 1, 1, 1, 1)
-                    ]
-                }
-            },
-            {
-                a: {
-                    b: 1234,
-                    c: [
-                        new Date(2016, 1, 1, 1, 1, 1)
-                    ]
-                }
-            });
-        testsComplete++;
-    });
-    
-    suite.test('t.notDeepEqual() pass', t => {
+    suite.test('t.notDeepEqual()', t => {
         testsCreated++;
         t.notDeepEqual({a: 123}, {a: 1234});
+        assert.throws(() => {
+            t.notDeepEqual({a: 123}, {a: 123});
+        });
         testsComplete++;
     });
     
-    suite.failing('t.notDeepEqual() fail', t => {
+    suite.test('t.greaterThan()', t => {
         testsCreated++;
-        t.notDeepEqual({a: 123}, {a: 123});
+        t.greaterThan(5, 1);
+        assert.throws(() => {
+            t.greaterThan(5, 10);
+        });
+        testsComplete++;
+    });
+    
+    suite.test('t.greaterThanOrEqual()', t => {
+        testsCreated++;
+        t.greaterThanOrEqual(5, 5);
+        assert.throws(() => {
+            t.greaterThanOrEqual(5, 10);
+        });
+        testsComplete++;
+    });
+    
+    suite.test('t.lessThan()', t => {
+        testsCreated++;
+        t.lessThan(5, 10);
+        assert.throws(() => {
+            t.lessThan(5, 1);
+        });
+        testsComplete++;
+    });
+    
+    suite.test('t.lessThanOrEqual()', t => {
+        testsCreated++;
+        t.lessThanOrEqual(5, 5);
+        assert.throws(() => {
+            t.lessThanOrEqual(5, 1);
+        });
+        testsComplete++;
+    });
+    
+    suite.test('t.lessThanOrEqual()', t => {
+        testsCreated++;
+        t.lessThanOrEqual(5, 5);
+        assert.throws(() => {
+            t.lessThanOrEqual(5, 1);
+        });
         testsComplete++;
     });
     
     suite.after(() => {
         assert.strictEqual(afterAll, false);
         assert.strictEqual(beforeAll, true);
-        assert.strictEqual(testsCreated, 17);
-        assert.strictEqual(testsComplete, 8);
+        assert.strictEqual(testsCreated, 13);
+        assert.strictEqual(testsComplete, 12);
         afterAll = true;
     });
 }
@@ -269,6 +290,6 @@ function suite4() {
 }
 
 suite1();
-suite2();
-suite3();
-suite4();
+// suite2();
+// suite3();
+// suite4();
