@@ -172,11 +172,19 @@ function suite1() {
         testsComplete++;
     });
     
+    suite.test('done()', (t, state, done) => {
+        testsCreated++;
+        setTimeout(() => {
+            testsComplete++;
+            done();
+        }, 200);
+    });
+    
     suite.after(() => {
         assert.strictEqual(afterAll, false);
         assert.strictEqual(beforeAll, true);
-        assert.strictEqual(testsCreated, 13);
-        assert.strictEqual(testsComplete, 12);
+        assert.strictEqual(testsCreated, 14);
+        assert.strictEqual(testsComplete, 13);
         afterAll = true;
     });
 }
@@ -281,6 +289,6 @@ function suite4() {
 }
 
 suite1();
-suite2();
-suite3();
-suite4();
+// suite2();
+// suite3();
+// suite4();
