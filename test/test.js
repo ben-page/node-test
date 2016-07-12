@@ -1,6 +1,10 @@
 'use strict';
-const Suite = require('../lib/suite');
 const Promise = require('bluebird');
+Promise.config({
+    warnings: true,
+    longStackTraces: true
+});
+const Suite = require('../lib/suite');
 const assert = require('../lib/assert');
 
 function suite1() {
