@@ -1,6 +1,6 @@
 {
   "name": "node-test",
-  "version": "0.0.5",
+  "version": "1.0.0",
   "description": "Simple, unobstrusive test runner",
   "main": "lib/suite.js",
   "scripts": {
