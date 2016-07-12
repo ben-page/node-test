@@ -180,11 +180,55 @@ function suite1() {
         }, 200);
     });
     
+    suite.test('throws()', t => {
+        testsCreated++;
+        t.throws(() => {
+            throw new Error('error');
+        });
+        assert.throws(() => {
+            t.throws(() => {
+                //no error
+            });
+        });
+        testsComplete++;
+    });
+    
+    suite.test('notThrows()', t => {
+        testsCreated++;
+        t.notThrows(() => {
+            //no error
+        });
+        assert.throws(() => {
+            t.notThrows(() => {
+                throw new Error('error');
+            });
+        });
+        testsComplete++;
+    });
+    
+    suite.test('noError()', t => {
+        testsCreated++;
+        
+        function callbackWithError(cb) {
+            cb(new Error());
+        }
+        
+        function callbackWithoutError(cb) {
+            cb(undefined);
+        }
+    
+        callbackWithoutError(t.noError);
+        assert.throws(() => {
+            callbackWithError(t.noError);
+        });
+        testsComplete++;
+    });
+    
     suite.after(() => {
         assert.strictEqual(afterAll, false);
         assert.strictEqual(beforeAll, true);
-        assert.strictEqual(testsCreated, 14);
-        assert.strictEqual(testsComplete, 13);
+        assert.strictEqual(testsCreated, 17);
+        assert.strictEqual(testsComplete, 16);
         afterAll = true;
     });
 }
@@ -289,6 +333,6 @@ function suite4() {
 }
 
 suite1();
-// suite2();
-// suite3();
-// suite4();
+suite2();
+suite3();
+suite4();
