@@ -1,0 +1,334 @@
+# node-test
+`node-test` is a simple, asynchronous test runner. This was developed in response what are design problems (in my opinion) with existing Node.js test runners. Writing tests should be just like writing any other code.
+
+## Core Philosophy
+
+* Fast - Concurrent Tests
+* No global variables
+* Optional CLI  - Running a test file directly (`node test/test-something.js`) produces the same output as using the CLI.
+* Minimal - Just runs your tests and gives you the results. There's no fancy error interpretation, just a plain old Node.js error callstack.
+* No planning tests or counting assertions.
+* Prefers Promises, but supports Callbacks
+* Include a simple, slightly expanded (compare to the core module `assert`) assertion library.
+
+## Compared to Other Test Runners
+
+These test runners have many great features and heavily inspired this module. However, there are key differences.
+
+#### [Mocha](https://mochajs.org/)
+1. Tests are run serially (one at a time).
+2. Defaults to using global variables (`describe()`, `it()`, etc).
+3. Mocha CLI is required, directly running a mocha test files fails.
+
+#### [tape](https://github.com/substack/tape)
+1. Tests are run serially (one at a time).
+2. The number of assertions has to be manually counted and planned (`t.plan()`) for every test.
+
+#### [ava](https://github.com/avajs/ava)
+1. Ava CLI is required, so directly running a test files fails.
+2. Ava's stack trace interpreter often removes helpful information, accesses properties on your object (causing side effects), and can interfere with other libraries built in error reporting (ie. Long Stack Traces)
+
+## Table of Contents
+
+- [Install](#install)
+- [Example](#example)
+- [API](#api)
+- [Todo](#todo)
+
+## Install
+
+```sh
+$ npm install --save-dev node-test
+```
+
+## Example
+
+```javascript
+'use strict';
+const Suite = require('node-test');
+
+const suite = new Suite('My Suite Name');
+suite.test('Test 1', t => {
+    return funcReturnsPromise()
+        .then(result => {
+            t.equal(result, 2);
+        });
+});
+
+suite.skip('Test 2', t => {
+    throw new Error('skipped');
+});
+
+suite.todo('Test 3 - Coming Soon');
+
+suite.test('Test 4', (t, state, done) => {
+    funcWithCallback(done);
+});
+
+suite.failing('Test 5 - Need to fix this', t => {
+    t.equal(1+1, 3);
+});
+
+```
+
+Output:
+```shell
+----My Suite Name----
+pass 1 - Test 1
+skip 2 - Test 2
+todo 3 - Test 3 - Coming Soon
+pass 4 - Test 4
+fail 5 - Test 5 - Need to fix this #failing test
+
+Total: 3
+Failed: 1 (5)
+Passed: 2 67%
+
+
+Process finished with exit code 0
+```
+
+## API
+
+### Suite
+The first thing you do in `node-test` is create a suite.
+
+```javascript
+const Suite = require('node-test');
+
+const suite = new Suite('My Suite Name');
+```
+
+#### Concurrent Tests
+By default `node-test` runs tests concurrently. Concurrent tests mean that your tests must be atomic. They should not depend on other tests for state.
+
+The following methods are used to create concurrent tests.
+##### `suite.test(name, action)` - Create a new test.
+###### Arguments
+- `name`: string - title for test
+- `action`: function(t, state, done) - test implementation
+  - `t`: object (built-in assertions)
+  - (optional) `state`: object - result of `beforeEach` hook
+  - (optional) `done`: function - callback for asynchronous tests
+
+###### Test Resolution
+- Any `Error` throw synchronously will cause the test to fail.
+- Asynchronous test can return a Promise or use the `done()` callback.
+  - If the test returns a Promise, the test will pass or fail if the promise resolves or rejects, respectively.
+  - If the `done()` callback is used, the test will fail if the first argument is defined. See [Node.js style callbacks](https://nodejs.org/api/errors.html#errors_node_js_style_callbacks).
+
+###### Synchronous Test:
+```javascript
+suite.test('My Test', t => {
+    const result = funcReturnsNumber();
+    t.equal(result, 2);
+});
+```
+###### Asynchronous Test with Promises:
+```javascript
+suite.test('My Test', t => {
+    return funcReturnsPromise()
+        .then(result => {
+            t.equal(result, 2);
+        });
+});
+```
+###### Asynchronous Tests with a Callback
+```javascript
+suite.test('My Test', (t, state, done) => {
+    funcWithCallback((err, result) => {
+        t.noError(err);
+        t.equal(result, 2);
+    });
+});
+
+suite.test('My Test 2', (t, state, done) => {
+    funcWithCallbackNoValue(done);
+});
+```
+
+##### `suite.skip(name, action)` - Creates a new test that will be skipped when the suite is run.
+###### Arguments
+Same as `suite.test()`.
+
+##### `suite.only(name, action)` - Creates a new test that will be run exclusively.
+When the suite run, `only` tests will be run and all other tests will be skipped.
+###### Arguments
+Same as `suite.test()`.
+
+##### `suite.todo(name)` - Creates a test placeholder.
+The "test" will be shown in the output, but will not count toward the total.
+###### Arguments
+- `name`: string - title for test
+
+##### `suite.failing(name, action)` - Creates a new test that is expected to fail.
+The test included as a failed test in the output, but don't cause the exit code to change (indicating the build failed).
+###### Arguments
+Same as `suite.test()`.
+
+#### Serial Tests
+You can create serial (one at a time) tests as well. Most of the time concurrent test are preferable, however there are times (such as when accessing a database) that you may want tests to run serially.
+
+Within a suite serial tests are executed first and the concurrent tests next. However, multiple suites are run concurrently. So two serial tests could run at the same time if they are members of different suites.
+
+The following methods are used to create serial tests. There usage is identical to the equivalent concurrent method.
+##### `suite.serial.test(name, action)`
+###### Arguments
+Same as `suite.test()`.
+
+##### `suite.serial.skip(name, action)`
+###### Arguments
+Same as `suite.test()`.
+
+##### `suite.serial.only(name, action)`
+###### Arguments
+Same as `suite.test()`.
+
+##### `suite.serial.todo(name)`
+###### Arguments
+Same as `suite.test()`.
+
+##### `suite.serial.failing(name, action)`
+###### Arguments
+Same as `suite.test()`.
+
+
+### Hooks
+`node-test` provides four hooks. The hooks are run serially to the tests.
+
+#### `suite.before(action)` - Run before all tests in the suite.
+#### `suite.after(action)` - Run after all tests in the suite.
+#### `suite.beforeEach(action)` - Run before each individual tests in the suite.
+The `beforeEach` hook runs before each test in the suite.
+###### Usage with `suite.beforeEach()`
+```javascript
+suite.beforeEach(t => {
+    const state = {
+        data: 2
+    };
+});
+
+suite.test('My Test 1', (t, state) => {
+    t.equal(1+1, state.data);
+    state.date = 3;
+});
+
+suite.test('My Test 2', (t, state) => {
+    t.equal(2, state.data); //state is still 2, because beforeEach is run individual for each test
+});
+```
+#### `suite.afterEach(action)` - Run after each individual tests in the suite.
+
+### t (Built-In Assertion Library)
+`node-test` includes an assertion library that is a bit more feature rich than the core assert module.
+
+#### `t.pass()`
+```javascript
+```
+#### `t.fail([message])`
+```javascript
+```
+#### `t.true(value, [message])`
+An assertion that `value` is strictly true. *`message` is optional. If defined, it will be displayed if the assertion fails.*
+```javascript
+const value = true;
+t.true(value);
+
+const arr = ['a'];
+t.true(arr.length === 1);
+```
+#### `t.false(value, [message])`
+An assertion that `value` is strictly false. *`message` is optional. If defined, it will be displayed if the assertion fails.*
+```javascript
+const value = false;
+t.false(value);
+```
+#### `t.truthy(value, [message])` alias: `t.assert()`
+An assertion that `value` is strictly truthy. *`message` is optional. If defined, it will be displayed if the assertion fails.*
+```javascript
+const value = 1;
+t.truthy(value);
+```
+#### `t.falsey(value, [message])`
+An assertion that `value` is strictly falsey. *`message` is optional. If defined, it will be displayed if the assertion fails.*
+```javascript
+const value = 0;
+t.falsey(value);
+```
+#### `t.equal(value, expected, [message])` aliases: `t.is(), t.equals()`
+An assertion that `value` is strictly equal to `expected`. *`message` is optional. If defined, it will be displayed if the assertion fails.*
+```javascript
+const value = 1;
+t.equal(value, 1);
+```
+#### `t.notEqual(value, expected, [message])` aliases: `t.not(), t.notEquals()`
+An assertion that `value` is strictly not equal to `expected`. *`message` is optional. If defined, it will be displayed if the assertion fails.*
+```javascript
+const value = 1;
+t.notEqual(value, 2);
+```
+#### `t.deepEqual(value, expected, [message])`
+An assertion that `value` is strictly and deeply equal to `expected`. Deep equality is tested by the [not-so-shallow](https://github.com/sotojuan/not-so-shallow) module. *`message` is optional. If defined, it will be displayed if the assertion fails.*
+```javascript
+const value = { data: 1234 };
+t.deepEqual(value, { data: 1234 });
+```
+#### `t.notDeepEqual(value, expected, [message])`
+An assertion that `value` is strictly and deeply not equal to `expected`. *`message` is optional. If defined, it will be displayed if the assertion fails.*
+```javascript
+const value = { data: 1234 };
+t.notDeepEqual(value, { data: 5678 });
+```
+#### `t.greaterThan(value, expected, [message])`
+An assertion that `value` is greater than `expected`. *`message` is optional. If defined, it will be displayed if the assertion fails.*
+```javascript
+const value = 2;
+t.greaterThan(value, 1);
+```
+#### `t.greaterThanOrEqual(value, expected, [message])`
+An assertion that `value` is greater than or equal to `expected`. *`message` is optional. If defined, it will be displayed if the assertion fails.*
+```javascript
+const value = 2;
+t.greaterThanOrEqual(value, 2);
+```
+#### `t.lessThan(value, expected, [message])`
+An assertion that `value` is less than `expected`. *`message` is optional. If defined, it will be displayed if the assertion fails.*
+```javascript
+const value = 1;
+t.lessThan(value, 2);
+```
+#### `t.lessThanOrEqual(value, expected, [message])`
+An assertion that `value` is less than or equal to `expected`. *`message` is optional. If defined, it will be displayed if the assertion fails.*
+```javascript
+const value = 1;
+t.lessThanOrEqual(value, 1);
+```
+#### `t.noError(error, [message])`
+An assertion that `error` is falsey. This is functionally similar to `t.falsey()`, but the assertion error message indicates the failure was due to an `Error`. *`message` is optional. If defined, it will be displayed if the assertion fails.*
+```javascript
+funcWithCallback((err, result) => {
+    t.noError(err);
+});
+```
+#### `t.throws(fn, [message])`
+An assertion that `fn` is function that throws an Error when executed. *`message` is optional. If defined, it will be displayed if the assertion fails.*
+```javascript
+t.throws(() => {
+    throw new Error('error');
+});
+```
+#### `t.notThrows(fn, [message])`
+An assertion that `fn` is function that does not throw an Error when executed. *`message` is optional. If defined, it will be displayed if the assertion fails.*
+```javascript
+t.throws(() => {
+    //doesn't throw
+});
+```
+
+## Todo
+
+* CLI with file watcher
+    * method for only running certain suites
+* Option to fail fast.
+* Additional reporter
+* Test timeout

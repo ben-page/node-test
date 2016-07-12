@@ -1,14 +1,19 @@
 {
   "name": "node-test",
   "version": "1.0.1",
-  "description": "Simple, unobstrusive test runner",
+  "description": "node-test is a simple, asynchronous test runner.",
+  "license": "MIT",
+  "homepage": "https://github.com/ben-page/node-test",
+  "author": "Ben Page <ben.page@openreign.com>",
   "main": "lib/suite.js",
+  "repository": "ben-page/node-test",
+  "readme": "READEME.md",
+  "engines" : {
+    "node" : ">=6.3.0"
+  },
   "scripts": {
     "test": "test/test.js"
   },
-  "repository": "ben-page/node-test",
-  "author": "Ben Page <ben.page@openreign.com>",
-  "license": "MIT",
   "dependencies": {
     "bluebird": "^3.4.1",
     "not-so-shallow": "^0.1.3"
