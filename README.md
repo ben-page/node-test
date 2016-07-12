@@ -15,7 +15,7 @@
 
 These test runners have many great features and heavily inspired this module. However, there are key differences.
 
-#### [Mocha](https://mochajs.org/)
+#### [Mocha](https://mochajs.org/), [Jasmine](http://jasmine.github.io/)
 1. Tests are run serially (one at a time).
 2. Defaults to using global variables (`describe()`, `it()`, etc).
 3. Mocha CLI is required, directly running a mocha test files fails.
