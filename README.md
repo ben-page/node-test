@@ -1,6 +1,20 @@
 # node-test
 `node-test` is a simple, asynchronous test runner. It's designed to address what are limitations of existing Node.js test runners. Writing tests should be just like writing any other code.
 
+## Table of Contents
+
+* [Core Philosophy](#core-philosophy)
+* [Comparison With Other Test Runners](#comparison-with-other-test-runners)
+* [Install](#install)
+* [Example](#example)
+* [API](#api)
+    * [Suite](#suite)
+        * [Concurrent Tests](#concurrent-tests)
+        * [Serial Tests](#serial-tests)
+    * [Hooks](#hooks)
+    * [Assertions](#t-built-in-assertion-library)
+* [Todo](#todo)
+
 ## Core Philosophy
 
 * Fast - Concurrent Tests
@@ -9,7 +23,7 @@
 * Minimal - Just runs your tests and gives you the results. There's no fancy error interpretation, just a plain old Node.js error callstack.
 * No planning tests or counting assertions.
 * Asynchronous Tests - Prefers Promises, but supports Callbacks
-* Built-In assertion library build on the core `assert`) module
+* Built-In assertion library build on the core `assert` module
 
 ## Comparison With Other Test Runners
 
@@ -27,13 +41,6 @@ These test runners have many great features and heavily inspired this module. Ho
 #### [ava](https://github.com/avajs/ava)
 1. Ava CLI is required, so directly running a test files fails.
 2. Ava's stack trace interpreter often removes helpful information, accesses properties on your object (causing side effects), and can interfere with other libraries built in error reporting (ie. Long Stack Traces)
-
-## Table of Contents
-
-- [Install](#install)
-- [Example](#example)
-- [API](#api)
-- [Todo](#todo)
 
 ## Install
 
@@ -241,11 +248,9 @@ Same as `suite.before()`.
 `node-test` includes an assertion library that is a bit more feature rich than the core assert module.
 
 #### `t.pass()`
-```javascript
-```
+
 #### `t.fail([message])`
-```javascript
-```
+
 #### `t.true(value, [message])`
 An assertion that `value` is strictly true. *`message` is optional. If defined, it will be displayed if the assertion fails.*
 ```javascript
@@ -338,16 +343,16 @@ t.throws(() => {
 #### `t.notThrows(fn, [message])`
 An assertion that `fn` is function that does not throw an Error when executed. *`message` is optional. If defined, it will be displayed if the assertion fails.*
 ```javascript
-t.throws(() => {
+t.notThrows(() => {
     //doesn't throw
 });
 ```
 
 ## Todo
 
-* CLI with file watcher
-    * method for only running certain suites
-* Additional reporter
-* Test timeout
-
-
+* CLI 
+    * file watcher
+    * only run certain files (glob matching)
+    * run suites in separate context
+* js-report support
+* test timeout
