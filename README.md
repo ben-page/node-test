@@ -1,5 +1,5 @@
 # node-test
-`node-test` is a simple, asynchronous test runner. This was developed in response what are design problems (in my opinion) with existing Node.js test runners. Writing tests should be just like writing any other code.
+`node-test` is a simple, asynchronous test runner. It's designed to address what are limitations of existing Node.js test runners. Writing tests should be just like writing any other code.
 
 ## Core Philosophy
 
@@ -8,10 +8,10 @@
 * Optional CLI  - Running a test file directly (`node test/test-something.js`) produces the same output as using the CLI.
 * Minimal - Just runs your tests and gives you the results. There's no fancy error interpretation, just a plain old Node.js error callstack.
 * No planning tests or counting assertions.
-* Prefers Promises, but supports Callbacks
-* Include a simple, slightly expanded (compare to the core module `assert`) assertion library.
+* Asynchronous Tests - Prefers Promises, but supports Callbacks
+* Built-In assertion library build on the core `assert`) module
 
-## Compared to Other Test Runners
+## Comparison With Other Test Runners
 
 These test runners have many great features and heavily inspired this module. However, there are key differences.
 
@@ -91,7 +91,12 @@ Process finished with exit code 0
 ## API
 
 ### Suite
-The first thing you do in `node-test` is create a suite.
+The first thing you do with `node-test` is create a suite for your tests.
+##### `new Suite(name, [options])`- suite constructor
+###### Arguments
+- `name`: string - title for test
+- `options`: object 
+  - `failFast`: boolean (default: false) - if a single test fails, stop all remaining tests in the suite
 
 ```javascript
 const Suite = require('node-test');
@@ -100,7 +105,7 @@ const suite = new Suite('My Suite Name');
 ```
 
 #### Concurrent Tests
-By default `node-test` runs tests concurrently. Concurrent tests mean that your tests must be atomic. They should not depend on other tests for state.
+By default `node-test` runs tests concurrently. Concurrency means that the tests must be atomic. They should not depend on other tests for state.
 
 The following methods are used to create concurrent tests.
 ##### `suite.test(name, action)` - Create a new test.
@@ -167,9 +172,9 @@ The test included as a failed test in the output, but don't cause the exit code 
 Same as `suite.test()`.
 
 #### Serial Tests
-You can create serial (one at a time) tests as well. Most of the time concurrent test are preferable, however there are times (such as when accessing a database) that you may want tests to run serially.
+`node-test` also supports serial tests (one at a time). Most of the time concurrent test are preferable, however there are times (such as when accessing a database) that you may want tests to run serially.
 
-Within a suite serial tests are executed first and the concurrent tests next. However, multiple suites are run concurrently. So two serial tests could run at the same time if they are members of different suites.
+Within a suite, serial tests are executed first followed by any concurrent tests. However, multiple suites are run concurrently. So two serial tests could run at the same time if they are members of different suites.
 
 The following methods are used to create serial tests. There usage is identical to the equivalent concurrent method.
 ##### `suite.serial.test(name, action)`
@@ -192,18 +197,29 @@ Same as `suite.test()`.
 ###### Arguments
 Same as `suite.test()`.
 
-
 ### Hooks
 `node-test` provides four hooks. The hooks are run serially to the tests.
 
 #### `suite.before(action)` - Run before all tests in the suite.
+###### Arguments
+- `name`: string - title for test
+- `action`: function(t, state, done) - test implementation
+  - `t`: object (built-in assertions)
+  - (optional) `done`: function - callback for asynchronous tests
+
 #### `suite.after(action)` - Run after all tests in the suite.
+###### Arguments
+Same as `suite.before()`.
+
 #### `suite.beforeEach(action)` - Run before each individual tests in the suite.
+###### Arguments
+Same as `suite.before()`.
+
 The `beforeEach` hook runs before each test in the suite.
 ###### Usage with `suite.beforeEach()`
 ```javascript
 suite.beforeEach(t => {
-    const state = {
+    return {
         data: 2
     };
 });
@@ -218,6 +234,8 @@ suite.test('My Test 2', (t, state) => {
 });
 ```
 #### `suite.afterEach(action)` - Run after each individual tests in the suite.
+###### Arguments
+Same as `suite.before()`.
 
 ### t (Built-In Assertion Library)
 `node-test` includes an assertion library that is a bit more feature rich than the core assert module.
@@ -329,6 +347,7 @@ t.throws(() => {
 
 * CLI with file watcher
     * method for only running certain suites
-* Option to fail fast.
 * Additional reporter
 * Test timeout
+
+
