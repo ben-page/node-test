@@ -1,5 +1,8 @@
-### 1.0.6
+### 1.0.7
 - Improved Documentation
+
+### 1.0.6
+- Use timers.setImmediate so that browserify works
 
 ### 1.0.5
 - Added Fail Fast suite config
