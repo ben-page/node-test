@@ -5,7 +5,7 @@ Promise.config({
     longStackTraces: true
 });
 const Suite = require('../lib/suite');
-const assert = require('../lib/assert');
+const assert = require('assert');
 
 function suite1() {
     const suite = new Suite('General Testing');
@@ -184,7 +184,7 @@ function suite1() {
         }, 200);
     });
     
-    suite.test('throws()', t => {
+    suite.test('t.throws()', t => {
         testsCreated++;
         t.throws(() => {
             throw new Error('error');
@@ -197,7 +197,7 @@ function suite1() {
         testsComplete++;
     });
     
-    suite.test('notThrows()', t => {
+    suite.test('t.notThrows()', t => {
         testsCreated++;
         t.notThrows(() => {
             //no error
@@ -210,7 +210,7 @@ function suite1() {
         testsComplete++;
     });
     
-    suite.test('noError()', t => {
+    suite.test('t.noError()', t => {
         testsCreated++;
         
         function callbackWithError(cb) {
@@ -226,6 +226,48 @@ function suite1() {
             callbackWithError(t.noError);
         });
         testsComplete++;
+    });
+    
+    suite.test('t.async() - Promise Pass', t => {
+        t.async(() => {
+            return Promise.delay(0);
+        });
+    });
+    
+    suite.failing('t.async() - Promise Fail', t => {
+        t.async(() => {
+            return Promise.delay(0)
+                .then(() => {
+                    throw new Error();
+                });
+        });
+    });
+    
+    suite.test('t.async() - Callback Pass', t => {
+        t.async(done => {
+            done();
+        });
+    });
+    
+    suite.failing('t.async() - Callback Fail', t => {
+        t.async(done => {
+            throw new Error();
+        });
+    });
+    
+    suite.test('t.async() - Callback Count Pass', t => {
+        t.async(done => {
+            done();
+            done();
+        }, 2);
+    });
+    
+    suite.failing('t.async() - Callback Count Fail', t => {
+        t.async(done => {
+            done();
+            done();
+            done();
+        }, 2);
     });
     
     suite.after(() => {
@@ -266,7 +308,7 @@ function suite3() {
     
     let one, two;
     
-    suite.beforeEach(() => {
+    suite.beforeEach(t => {
         return { init: true };
     });
     
@@ -275,11 +317,15 @@ function suite3() {
     });
     
     suite.test('first', (t, state) => {
+        t.equal(state.init, true);
+        t.falsey(state.complete);
         one = state;
         state.start = true;
     });
     
     suite.test('second', (t, state) => {
+        t.equal(state.init, true);
+        t.falsey(state.complete);
         two = state;
         state.start = true;
     });
