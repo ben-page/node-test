@@ -1,6 +1,6 @@
 {
   "name": "node-test",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "node-test is a simple, asynchronous test runner.",
   "license": "MIT",
   "homepage": "https://github.com/ben-page/node-test",
