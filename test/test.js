@@ -15,8 +15,9 @@ function suite1() {
     let testsComplete = 0;
     let afterAll = false;
     
-    suite.before(() => {
+    suite.before(t => {
         beforeAll = true;
+        assert(t.equals);
         assert.equal(afterAll, false);
         assert.equal(testsCreated, 0);
         assert.equal(testsComplete, 0);
@@ -392,7 +393,7 @@ function suite5() {
         });
     });
     
-    suite.test('fail', t => {
+    suite.failing('fail', t => {
         t.async(() => {
             return Promise.delay(1200);
         });

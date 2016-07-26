@@ -244,13 +244,24 @@ suite.test('My Test 2', (t, state) => {
 ###### Arguments
 Same as `suite.before()`.
 
+#### Other Members
+
+##### `suite.setTimeout(delay)` - Set the time limit for tests (default: 5000)
+Tests whose execution time exceeds the delay will fail.
+###### Arguments
+- `delay`: number - timeout in milliseconds
+
 ### t (Built-In Assertion Library)
 `node-test` includes an assertion library that is a bit more feature rich than the core assert module.
 
 #### `t.pass()`
-
+```javascript
+t.pass();
+```
 #### `t.fail([message])`
-
+```javascript
+t.fail();
+```
 #### `t.true(value, [message])`
 An assertion that `value` is strictly true. *`message` is optional. If defined, it will be displayed if the assertion fails.*
 ```javascript
