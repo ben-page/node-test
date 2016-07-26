@@ -382,7 +382,25 @@ function suite4() {
     });
 }
 
+function suite5() {
+    const suite = new Suite('timeout tests');
+    suite.setTimeout(1000);
+    
+    suite.test('pass', t => {
+        t.async(() => {
+            return Promise.delay(800);
+        });
+    });
+    
+    suite.test('fail', t => {
+        t.async(() => {
+            return Promise.delay(1200);
+        });
+    });
+}
+
 suite1();
 suite2();
 suite3();
 suite4();
+suite5();
