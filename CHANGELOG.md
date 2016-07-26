@@ -1,3 +1,8 @@
+### 1.0.8
+- asynchronous assertions
+- test timeouts
+- color output on reporter
+
 ### 1.0.7
 - Improved Documentation
 

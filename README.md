@@ -347,12 +347,50 @@ t.notThrows(() => {
     //doesn't throw
 });
 ```
+#### `t.async(fn, [count], [message])`
+An asynchronous assertion that `fn` eventually executes a callback or returns a Promise that eventually resolves. *`message` is optional. If defined, it will be displayed if the assertion fails.*
+
+##### Asynchronous Assertion with Promises
+```javascript
+t.async(() => {
+    return funcReturnsPromise();
+});
+```
+##### Asynchronous Assertion with a Callback
+```javascript
+t.async(done1 => {
+    funcWithCallback((err, result) => {
+        t.noError(err);
+        t.equal(result, 2);
+        done1();
+    });
+});
+
+t.async(done1 => {
+    funcWithCallback(done1);
+});
+```
+##### Asynchronous Assertion with a Callback and Count
+```javascript
+t.async(done1 => {
+    funcWithCallback(done1);
+    funcWithCallback(done1);
+    funcWithCallback(done1);
+}, 3);
+```
 
 ## Todo
 
 * CLI 
     * file watcher
     * only run certain files (glob matching)
-    * run suites in separate context
+    * run suites in individual contexts
+    * harmony flag
 * js-report support
-* test timeout
+
+## Considering
+* code coverage
+* slow tests
+* logging - ala Karma
+* support CoffeeScript, TypeScript
+* support plugins
