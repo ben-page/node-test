@@ -1,3 +1,6 @@
+### 1.0.9
+- bug fix
+
 ### 1.0.8
 - asynchronous assertions
 - test timeouts

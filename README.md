@@ -387,6 +387,7 @@ t.async(done1 => {
     * run suites in individual contexts
     * harmony flag
 * js-report support
+* test Error output
 
 ## Considering
 * code coverage
