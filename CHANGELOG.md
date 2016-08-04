@@ -1,3 +1,8 @@
+### 1.1.0
+- removed t.async()
+- expanded t.throws() to handle both synchronous and asynchronous errors
+- change t.async() to t.count()
+
 ### 1.0.11
 - bug fix
 

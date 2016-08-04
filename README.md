@@ -13,6 +13,7 @@
         * [Serial Tests](#serial-tests)
     * [Hooks](#hooks)
     * [Assertions](#t-built-in-assertion-library)
+* [Running Multiple Suites](#running-multiple-suites)
 * [Todo](#todo)
 
 ## Core Philosophy
@@ -253,7 +254,8 @@ Tests whose execution time exceeds the delay will fail.
 
 ### t (Built-In Assertion Library)
 `node-test` includes an assertion library that is a bit more feature rich than the core assert module.
-
+ * For every method, `message` is optional. If defined, it will be displayed if the assertion fails.*
+ 
 #### `t.pass()`
 ```javascript
 t.pass();
@@ -263,7 +265,7 @@ t.pass();
 t.fail();
 ```
 #### `t.true(value, [message])`
-An assertion that `value` is strictly true. *`message` is optional. If defined, it will be displayed if the assertion fails.*
+An assertion that `value` is strictly true.
 ```javascript
 const value = true;
 t.true(value);
@@ -272,123 +274,186 @@ const arr = ['a'];
 t.true(arr.length === 1);
 ```
 #### `t.false(value, [message])`
-An assertion that `value` is strictly false. *`message` is optional. If defined, it will be displayed if the assertion fails.*
+An assertion that `value` is strictly false.
 ```javascript
 const value = false;
 t.false(value);
 ```
 #### `t.truthy(value, [message])` alias: `t.assert()`
-An assertion that `value` is strictly truthy. *`message` is optional. If defined, it will be displayed if the assertion fails.*
+An assertion that `value` is strictly truthy.
 ```javascript
 const value = 1;
 t.truthy(value);
 ```
 #### `t.falsey(value, [message])`
-An assertion that `value` is strictly falsey. *`message` is optional. If defined, it will be displayed if the assertion fails.*
+An assertion that `value` is strictly falsey.
 ```javascript
 const value = 0;
 t.falsey(value);
 ```
 #### `t.equal(value, expected, [message])` aliases: `t.is(), t.equals()`
-An assertion that `value` is strictly equal to `expected`. *`message` is optional. If defined, it will be displayed if the assertion fails.*
+An assertion that `value` is strictly equal to `expected`.
 ```javascript
 const value = 1;
 t.equal(value, 1);
 ```
 #### `t.notEqual(value, expected, [message])` aliases: `t.not(), t.notEquals()`
-An assertion that `value` is strictly not equal to `expected`. *`message` is optional. If defined, it will be displayed if the assertion fails.*
+An assertion that `value` is strictly not equal to `expected`.
 ```javascript
 const value = 1;
 t.notEqual(value, 2);
 ```
 #### `t.deepEqual(value, expected, [message])`
-An assertion that `value` is strictly and deeply equal to `expected`. Deep equality is tested by the [not-so-shallow](https://github.com/sotojuan/not-so-shallow) module. *`message` is optional. If defined, it will be displayed if the assertion fails.*
+An assertion that `value` is strictly and deeply equal to `expected`. Deep equality is tested by the [not-so-shallow](https://github.com/sotojuan/not-so-shallow) module.
 ```javascript
 const value = { data: 1234 };
 t.deepEqual(value, { data: 1234 });
 ```
 #### `t.notDeepEqual(value, expected, [message])`
-An assertion that `value` is strictly and deeply not equal to `expected`. *`message` is optional. If defined, it will be displayed if the assertion fails.*
+An assertion that `value` is strictly and deeply not equal to `expected`.
 ```javascript
 const value = { data: 1234 };
 t.notDeepEqual(value, { data: 5678 });
 ```
 #### `t.greaterThan(value, expected, [message])`
-An assertion that `value` is greater than `expected`. *`message` is optional. If defined, it will be displayed if the assertion fails.*
+An assertion that `value` is greater than `expected`.
 ```javascript
 const value = 2;
 t.greaterThan(value, 1);
 ```
 #### `t.greaterThanOrEqual(value, expected, [message])`
-An assertion that `value` is greater than or equal to `expected`. *`message` is optional. If defined, it will be displayed if the assertion fails.*
+An assertion that `value` is greater than or equal to `expected`.
 ```javascript
 const value = 2;
 t.greaterThanOrEqual(value, 2);
 ```
 #### `t.lessThan(value, expected, [message])`
-An assertion that `value` is less than `expected`. *`message` is optional. If defined, it will be displayed if the assertion fails.*
+An assertion that `value` is less than `expected`.
 ```javascript
 const value = 1;
 t.lessThan(value, 2);
 ```
 #### `t.lessThanOrEqual(value, expected, [message])`
-An assertion that `value` is less than or equal to `expected`. *`message` is optional. If defined, it will be displayed if the assertion fails.*
+An assertion that `value` is less than or equal to `expected`. *`message` is optional. If defined, it will be displayed if the assertion fails.
 ```javascript
 const value = 1;
 t.lessThanOrEqual(value, 1);
 ```
 #### `t.noError(error, [message])`
-An assertion that `error` is falsey. This is functionally similar to `t.falsey()`, but the assertion error message indicates the failure was due to an `Error`. *`message` is optional. If defined, it will be displayed if the assertion fails.*
+An assertion that `error` is falsey. This is functionally similar to `t.falsey()`, but the assertion error message indicates the failure was due to an `Error`.
 ```javascript
 funcWithCallback((err, result) => {
     t.noError(err);
 });
 ```
-#### `t.throws(fn, [message])`
-An assertion that `fn` is function that throws an Error when executed. *`message` is optional. If defined, it will be displayed if the assertion fails.*
+#### `t.notThrows(fn, [message])`
+An assertion that `fn` is function that does not throws an Error synchronously nor asynchronously (via Promise or callback).
+###### Arguments
+- `fn`: function([done]) - code to assert throws
+  - (optional) `done`: function - callback for asynchronous test
+
+###### Synchronous Assertion
+Would Pass:
+```javascript
+t.notThrows(() => {
+    t.equal(1, 1);
+});
+```
+Would Fail:
 ```javascript
 t.throws(() => {
     throw new Error('error');
 });
 ```
-#### `t.notThrows(fn, [message])`
-An assertion that `fn` is function that does not throw an Error when executed. *`message` is optional. If defined, it will be displayed if the assertion fails.*
+###### Asynchronous Assertion with Promises
 ```javascript
 t.notThrows(() => {
-    //doesn't throw
-});
-```
-#### `t.async(fn, [count], [message])`
-An asynchronous assertion that `fn` eventually executes a callback or returns a Promise that eventually resolves. *`message` is optional. If defined, it will be displayed if the assertion fails.*
-
-##### Asynchronous Assertion with Promises
-```javascript
-t.async(() => {
     return funcReturnsPromise();
 });
 ```
-##### Asynchronous Assertion with a Callback
+###### Asynchronous/Synchronous Assertion with Callback
+The callback can be asynchronous or synchronous. The callback can be executed immediately or later. It will be handled the same.
 ```javascript
-t.async(done1 => {
+t.notThrows(done1 => {
+    funcWithAsyncCallback(done1);
+});
+t.notThrows(done1 => {
+    funcWithSyncCallback(done1);
+});
+t.notThrows(done1 => {
     funcWithCallback((err, result) => {
         t.noError(err);
         t.equal(result, 2);
         done1();
     });
 });
-
-t.async(done1 => {
-    funcWithCallback(done1);
+```
+Even if an asynchronous mode is used, synchronous errors are caught.
+###### Mixed Synchronous & Asynchronous
+Would Fail:
+```javascript
+t.notThrows(done => {
+    funcWithAsyncCallback(done);
+    throw new Error('message');
+});
+t.notThrows(done => {
+    throw new Error('message');
+    return funcReturnsPromise();
 });
 ```
-##### Asynchronous Assertion with a Callback and Count
+
+#### `t.throws(fn, [message])`
+An assertion that `fn` is function that either throws an Error synchronously or asynchronously (via Promise or callback).
+###### Arguments
+- `fn`: function([done]) - code to assert throws
+  - (optional) `done`: function - callback for asynchronous test
+
+This functions the same as `t.notThrow()`, except that it passes when there is an Error rather passing when there is no Error. For more detail, look at the `notThrows` examples.
+
+#### `t.count(fn, count, [message])`
+An asynchronous assertion that `fn` eventually executes a callback a precise number of times.
+
 ```javascript
-t.async(done1 => {
+t.count(done1 => {
     funcWithCallback(done1);
     funcWithCallback(done1);
     funcWithCallback(done1);
 }, 3);
 ```
+
+## Running Multiple Suites
+There are couple ways to run multiple suites.
+1. The easiest (and least flexible) way to just place multiple suites in a single file.
+2. A more flexible way is to create one suite per file and create an index file to run them all.
+
+    Imagine your `test` directory looks like this:
+    ```
+    suite1.js
+    suite2.js
+    suite3.js
+    ```
+    
+    You could create a file called `index.js` with these contents:
+    ```javascript
+    'use strict';
+    require('./suite1');
+    require('./suite2');
+    require('./suite3');
+    ```
+    
+    Then add the script to your `package.json` file:
+    ```json
+    "scripts": {
+      "test": "node test/index.js"
+    }
+    ```
+    
+    Now you can run individual suites or the whole thing from the command line.
+    ```shell
+    node tests/suite1.js
+    npm test
+    ```
+3. The up coming CLI will make it easier to execute multiple suites without needing to maintain an `index.js`.
 
 ## Todo
 

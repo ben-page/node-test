@@ -180,6 +180,18 @@ function suite1() {
         });
     });
     
+    suite.test('t.throws() - with callback', t => {
+        t.throws(done => {
+            done();
+        });
+    });
+    
+    suite.failing('t.throws() - with callback error', t => {
+        t.throws(done => {
+            done(new Error('error'));
+        });
+    });
+    
     suite.test('t.notThrows() synchronous', t => {
         t.notThrows(() => {
             //no error
@@ -219,42 +231,15 @@ function suite1() {
         });
     });
     
-    suite.test('t.async() - Promise Pass', t => {
-        t.async(() => {
-            return Promise.delay(0);
-        });
-    });
-    
-    suite.failing('t.async() - Promise Fail', t => {
-        t.async(() => {
-            return Promise.delay(0)
-                .then(() => {
-                    throw new Error();
-                });
-        });
-    });
-    
-    suite.test('t.async() - Callback Pass', t => {
-        t.async(done => {
-            done();
-        });
-    });
-    
-    suite.failing('t.async() - Callback Fail', t => {
-        t.async(done => {
-            throw new Error();
-        });
-    });
-    
-    suite.test('t.async() - Callback Count Pass', t => {
-        t.async(done => {
+    suite.test('t.count() - Count Pass', t => {
+        t.count(done => {
             done();
             done();
         }, 2);
     });
     
-    suite.failing('t.async() - Callback Count Fail', t => {
-        t.async(done => {
+    suite.failing('t.count() - Count Fail', t => {
+        t.count(done => {
             done();
             done();
             done();
@@ -401,13 +386,14 @@ function suite6() {
     suite.setTimeout(1000);
     
     suite.test('pass', t => {
-        t.async(() => {
+        t.notThrows(() => {
             return Promise.delay(800);
         });
     });
     
+    //this is not a great way to test this. it's not really testing for the timeout, just a failure.
     suite.failing('fail', t => {
-        t.async(() => {
+        t.notThrows(() => {
             return Promise.delay(1200);
         });
     });
