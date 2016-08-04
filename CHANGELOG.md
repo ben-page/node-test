@@ -1,3 +1,6 @@
+### 1.1.1
+- fixed missing t.throws argument in documentation
+
 ### 1.1.0
 - removed t.async()
 - expanded t.throws() to handle both synchronous and asynchronous errors

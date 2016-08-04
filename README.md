@@ -402,13 +402,25 @@ t.notThrows(done => {
 });
 ```
 
-#### `t.throws(fn, [message])`
+#### `t.throws(fn, [errTestFn], [message])`
 An assertion that `fn` is function that either throws an Error synchronously or asynchronously (via Promise or callback).
 ###### Arguments
 - `fn`: function([done]) - code to assert throws
   - (optional) `done`: function - callback for asynchronous test
+- `errTestFn`: function() - code to test the error
 
-This functions the same as `t.notThrow()`, except that it passes when there is an Error rather passing when there is no Error. For more detail, look at the `notThrows` examples.
+Except for the `errTestFn` argument, this functions as the opposite of `t.notThrow()`. That is `throws` passes when there is an Error rather passing when there is no Error. For more usage details, look at the `notThrows` examples.
+
+Passing `errTestFn` allows testing that the Error received is the Error expected.
+```javascript
+t.throws(() => {
+    return funcReturnsPromise();
+},
+err => {
+    t.true(err instanceof TypeError);
+    t.equal(err.message, 'invalid argument');
+});
+```
 
 #### `t.count(fn, count, [message])`
 An asynchronous assertion that `fn` eventually executes a callback a precise number of times.
