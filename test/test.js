@@ -10,26 +10,11 @@ const assert = require('assert');
 function suite1() {
     const suite = new Suite('General Testing');
     
-    let beforeAll = false;
-    let testsCreated = 0;
-    let testsComplete = 0;
-    let afterAll = false;
-    
-    suite.before(t => {
-        beforeAll = true;
-        assert(t.equals);
-        assert.equal(afterAll, false);
-        assert.equal(testsCreated, 0);
-        assert.equal(testsComplete, 0);
-    });
-    
     suite.test('t.is()', t => {
-        testsCreated++;
         t.is(1, 1);
         t.throws(() => {
             t.is(1, 5);
         });
-        testsComplete++;
     });
     
     suite.todo('something todo', t => {
@@ -41,58 +26,45 @@ function suite1() {
     });
     
     suite.failing('fail()', t => {
-        testsCreated++;
         t.fail('something bad happened');
-        testsComplete++;
     });
     
     suite.test('t.not()', t => {
-        testsCreated++;
         t.not(1, 5);
         t.throws(() => {
             t.not(1, 1);
         });
-        testsComplete++;
     });
     
     suite.test('t.true()', t => {
-        testsCreated++;
         t.true(true);
         t.throws(() => {
             t.true(false);
         });
-        testsComplete++;
     });
     
     suite.test('t.false()', t => {
-        testsCreated++;
         t.false(false);
         t.throws(() => {
             t.false(true);
         });
-        testsComplete++;
     });
     
     suite.test('t.truthy()', t => {
-        testsCreated++;
         t.truthy(1);
         t.throws(() => {
             t.truthy(0);
         });
-        testsComplete++;
     });
     
     suite.test('t.falsey()', t => {
-        testsCreated++;
         t.falsey(0);
         t.throws(() => {
             t.falsey(1);
         });
-        testsComplete++;
     });
     
     suite.test('t.deepEqual()', t => {
-        testsCreated++;
         t.deepEqual(
             {
                 a: {
@@ -129,77 +101,98 @@ function suite1() {
                     }
                 });
         });
-        testsComplete++;
     });
     
     suite.test('t.notDeepEqual()', t => {
-        testsCreated++;
         t.notDeepEqual({a: 123}, {a: 1234});
         t.throws(() => {
             t.notDeepEqual({a: 123}, {a: 123});
         });
-        testsComplete++;
     });
     
     suite.test('t.greaterThan()', t => {
-        testsCreated++;
         t.greaterThan(5, 1);
         t.throws(() => {
             t.greaterThan(5, 10);
         });
-        testsComplete++;
     });
     
     suite.test('t.greaterThanOrEqual()', t => {
-        testsCreated++;
         t.greaterThanOrEqual(5, 5);
         t.throws(() => {
             t.greaterThanOrEqual(5, 10);
         });
-        testsComplete++;
     });
     
     suite.test('t.lessThan()', t => {
-        testsCreated++;
         t.lessThan(5, 10);
         t.throws(() => {
             t.lessThan(5, 1);
         });
-        testsComplete++;
     });
     
     suite.test('t.lessThanOrEqual()', t => {
-        testsCreated++;
         t.lessThanOrEqual(5, 5);
         t.throws(() => {
             t.lessThanOrEqual(5, 1);
         });
-        testsComplete++;
     });
     
     suite.test('done()', (t, state, done) => {
-        testsCreated++;
         setTimeout(() => {
-            testsComplete++;
             done();
         }, 200);
     });
     
-    suite.test('t.throws()', t => {
-        testsCreated++;
+    suite.test('t.throws() synchronous', t => {
         t.throws(() => {
             throw new Error('error');
         });
-        t.throws(() => {
-            t.throws(() => {
-                //no error
-            });
-        });
-        testsComplete++;
     });
     
-    suite.test('t.notThrows()', t => {
-        testsCreated++;
+    suite.test('t.throws() asynchronous', t => {
+        t.throws(() => {
+            return Promise.delay(100).return(Promise.reject(new Error('error')));
+        });
+    });
+    
+    suite.failing('t.throws() failures', t => {
+        t.throws(() => {
+            return Promise.delay(100).return(Promise.resolve(true));
+        });
+    });
+    
+    suite.test('t.throws() nested', t => {
+        t.throws(() => {
+            t.throws(() => {
+                //no error, so first t.throws() asserts
+            });
+        });
+    });
+    
+    suite.test('t.throws() with test', t => {
+        t.throws(() => {
+            throw new Error('error')
+        },
+        err => {
+            t.true(err instanceof Error);
+            t.equal(err.message, 'error');
+        });
+    });
+    
+    suite.test('t.notThrows() synchronous', t => {
+        t.notThrows(() => {
+            //no error
+        });
+    });
+    
+    suite.test('t.notThrows() asynchronous', t => {
+        t.notThrows(() => {
+            return Promise.delay(100).return(Promise.resolve(true));
+        });
+    });
+    
+    suite.test('t.notThrows() nested', t => {
         t.notThrows(() => {
             //no error
         });
@@ -208,11 +201,9 @@ function suite1() {
                 throw new Error('error');
             });
         });
-        testsComplete++;
     });
     
     suite.test('t.noError()', t => {
-        testsCreated++;
         
         function callbackWithError(cb) {
             cb(new Error());
@@ -226,7 +217,6 @@ function suite1() {
         t.throws(() => {
             callbackWithError(t.noError);
         });
-        testsComplete++;
     });
     
     suite.test('t.async() - Promise Pass', t => {
@@ -270,21 +260,55 @@ function suite1() {
             done();
         }, 2);
     });
+}
+
+function suite2() {
+    const suite = new Suite('Testing suite level hooks');
     
-    suite.after(() => {
-        assert.equal(afterAll, false);
-        assert.equal(beforeAll, true);
-        assert.equal(testsCreated, 17);
-        assert.equal(testsComplete, 16);
+    let beforeAll = false;
+    let testsCreated = 0;
+    let testsComplete = 0;
+    let afterAll = false;
+    
+    suite.before(t => {
+        beforeAll = true;
+        assert(t.equals);
+        t.false(afterAll);
+        t.equal(testsCreated, 0);
+        t.equal(testsComplete, 0);
+    });
+    
+    suite.test('pass 1', t => {
+        testsCreated++;
+        t.is(1, 1);
+        testsComplete++;
+    });
+    
+    suite.test('pass 2', t => {
+        testsCreated++;
+        t.is(2, 2);
+        testsComplete++;
+    });
+    
+    suite.after(t => {
+        t.true(beforeAll);
+        t.false(afterAll);
+        t.equal(testsCreated, 2);
+        t.equal(testsComplete, 2);
         afterAll = true;
     });
 }
 
-function suite2() {
+function suite3() {
     const suite = new Suite('Testing .only()');
     
     let testsCreated = 0;
     let testsComplete = 0;
+    
+    suite.before(t => {
+        t.equal(testsCreated, 0);
+        t.equal(testsComplete, 0);
+    });
     
     suite.test('fail', t => {
         testsCreated++;
@@ -298,13 +322,13 @@ function suite2() {
         testsComplete++;
     });
     
-    suite.after(() => {
-        assert.equal(testsCreated, 1);
-        assert.equal(testsComplete, 1);
+    suite.after(t => {
+        t.equal(testsCreated, 1);
+        t.equal(testsComplete, 1);
     });
 }
 
-function suite3() {
+function suite4() {
     const suite = new Suite('beforeEach & afterEach');
     
     let one, two;
@@ -331,59 +355,48 @@ function suite3() {
         state.start = true;
     });
     
-    suite.after(() => {
-        assert.equal(one.init, true);
-        assert.equal(one.start, true);
-        assert.equal(one.complete, true);
-        assert.equal(two.init, true);
-        assert.equal(two.start, true);
-        assert.equal(two.complete, true);
-    });
-}
-
-function suite4() {
-    const suite = new Suite('asynchronous & serial');
-    
-    let testsCreated = 0;
-    let testsComplete = 0;
-    
-    suite.test('asynchronous test', t => {
-        testsCreated++;
-        return Promise.delay(10)
-            .then(() => {
-                testsComplete++;
-                assert.equal(testsCreated, 3);
-                assert.equal(testsComplete, 3);
-            });
-    });
-    
-    suite.serial.test('serial 1', t => {
-        testsCreated++;
-        return Promise.delay(300)
-            .then(() => {
-                testsComplete++;
-                assert.equal(testsCreated, 1);
-                assert.equal(testsComplete, 1);
-            });
-    });
-    
-    suite.serial.test('serial 2', t => {
-        testsCreated++;
-        return Promise.delay(100)
-            .then(() => {
-                testsComplete++;
-                assert.equal(testsCreated, 2);
-                assert.equal(testsComplete, 2);
-            });
-    });
-
-    suite.after(() => {
-        assert.equal(testsCreated, 3);
-        assert.equal(testsComplete, 3);
+    suite.after(t => {
+        t.equal(one.init, true);
+        t.equal(one.start, true);
+        t.equal(one.complete, true);
+        t.equal(two.init, true);
+        t.equal(two.start, true);
+        t.equal(two.complete, true);
     });
 }
 
 function suite5() {
+    const suite = new Suite('asynchronous & serial');
+    
+    let count = 1;
+    
+    suite.test('asynchronous test', t => {
+        return Promise.delay(10)
+            .then(() => {
+                t.equal(count++, 3);
+            });
+    });
+    
+    suite.serial.test('serial 1', t => {
+        return Promise.delay(300)
+            .then(() => {
+                t.equal(count++, 1);
+            });
+    });
+    
+    suite.serial.test('serial 2', t => {
+        return Promise.delay(100)
+            .then(() => {
+                t.equal(count++, 2);
+            });
+    });
+    
+    suite.after(t => {
+        t.equal(count, 4);
+    })
+}
+
+function suite6() {
     const suite = new Suite('timeout tests');
     suite.setTimeout(1000);
     
@@ -405,3 +418,4 @@ suite2();
 suite3();
 suite4();
 suite5();
+suite6();
