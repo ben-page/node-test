@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="node-test : A simple, asynchronous test runner for Node.js.">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>node-test</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/ben-page/node-test">View on GitHub</a>
+
+          <h1 id="project_title">node-test</h1>
+          <h2 id="project_tagline">A simple, asynchronous test runner for Node.js.</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/ben-page/node-test/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/ben-page/node-test/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a id="node-test" class="anchor" href="#node-test" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>node-test</h1>
+
+<p><code>node-test</code> is a simple, asynchronous test runner. It's designed to address what are limitations of existing Node.js test runners. Writing tests should be just like writing any other code.</p>
+
+<h2>
+<a id="table-of-contents" class="anchor" href="#table-of-contents" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Table of Contents</h2>
+
+<ul>
+<li><a href="#core-philosophy">Core Philosophy</a></li>
+<li><a href="#comparison-with-other-test-runners">Comparison With Other Test Runners</a></li>
+<li><a href="#install">Install</a></li>
+<li><a href="#example">Example</a></li>
+<li>
+<a href="#api">API</a>
+
+<ul>
+<li>
+<a href="#suite">Suite</a>
+
+<ul>
+<li><a href="#concurrent-tests">Concurrent Tests</a></li>
+<li><a href="#serial-tests">Serial Tests</a></li>
+</ul>
+</li>
+<li><a href="#hooks">Hooks</a></li>
+<li><a href="#t-built-in-assertion-library">Assertions</a></li>
+</ul>
+</li>
+<li><a href="#running-multiple-suites">Running Multiple Suites</a></li>
+<li><a href="#todo">Todo</a></li>
+</ul>
+
+<h2>
+<a id="core-philosophy" class="anchor" href="#core-philosophy" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Core Philosophy</h2>
+
+<ul>
+<li>Fast - Concurrent Tests</li>
+<li>No global variables</li>
+<li>Optional CLI  - Running a test file directly (<code>node test/test-something.js</code>) produces the same output as using the CLI.</li>
+<li>Minimal - Just runs your tests and gives you the results. There's no fancy error interpretation, just a plain old Node.js error callstack.</li>
+<li>No planning tests or counting assertions.</li>
+<li>Asynchronous Tests - Prefers Promises, but supports Callbacks</li>
+<li>Built-In assertion library build on the core <code>assert</code> module</li>
+</ul>
+
+<h2>
+<a id="comparison-with-other-test-runners" class="anchor" href="#comparison-with-other-test-runners" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Comparison With Other Test Runners</h2>
+
+<p>These test runners have many great features and heavily inspired this module. However, there are key differences.</p>
+
+<h4>
+<a id="mocha-jasmine" class="anchor" href="#mocha-jasmine" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a href="https://mochajs.org/">Mocha</a>, <a href="http://jasmine.github.io/">Jasmine</a>
+</h4>
+
+<ol>
+<li>Tests are run serially (one at a time).</li>
+<li>Defaults to using global variables (<code>describe()</code>, <code>it()</code>, etc).</li>
+<li>Mocha CLI is required, directly running a mocha test files fails.</li>
+</ol>
+
+<h4>
+<a id="tape" class="anchor" href="#tape" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a href="https://github.com/substack/tape">tape</a>
+</h4>
+
+<ol>
+<li>Tests are run serially (one at a time).</li>
+<li>The number of assertions has to be manually counted and planned (<code>t.plan()</code>) for every test.</li>
+</ol>
+
+<h4>
+<a id="ava" class="anchor" href="#ava" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a href="https://github.com/avajs/ava">ava</a>
+</h4>
+
+<ol>
+<li>Ava CLI is required, so directly running a test files fails.</li>
+<li>Ava's stack trace interpreter often removes helpful information, accesses properties on your object (causing side effects), and can interfere with other libraries built in error reporting (ie. Long Stack Traces)</li>
+</ol>
+
+<h2>
+<a id="install" class="anchor" href="#install" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Install</h2>
+
+<div class="highlight highlight-source-shell"><pre>$ npm install --save-dev node-test</pre></div>
+
+<h2>
+<a id="example" class="anchor" href="#example" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Example</h2>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-s"><span class="pl-pds">'</span>use strict<span class="pl-pds">'</span></span>;
+<span class="pl-k">const</span> <span class="pl-c1">Suite</span> <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>node-test<span class="pl-pds">'</span></span>);
+
+<span class="pl-k">const</span> <span class="pl-c1">suite</span> <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">Suite</span>(<span class="pl-s"><span class="pl-pds">'</span>My Suite Name<span class="pl-pds">'</span></span>);
+<span class="pl-smi">suite</span>.<span class="pl-c1">test</span>(<span class="pl-s"><span class="pl-pds">'</span>Test 1<span class="pl-pds">'</span></span>, <span class="pl-smi">t</span> <span class="pl-k">=&gt;</span> {
+    <span class="pl-k">return</span> <span class="pl-en">funcReturnsPromise</span>()
+        .<span class="pl-en">then</span>(<span class="pl-smi">result</span> <span class="pl-k">=&gt;</span> {
+            <span class="pl-smi">t</span>.<span class="pl-en">equal</span>(result, <span class="pl-c1">2</span>);
+        });
+});
+
+<span class="pl-smi">suite</span>.<span class="pl-en">skip</span>(<span class="pl-s"><span class="pl-pds">'</span>Test 2<span class="pl-pds">'</span></span>, <span class="pl-smi">t</span> <span class="pl-k">=&gt;</span> {
+    <span class="pl-k">throw</span> <span class="pl-k">new</span> <span class="pl-en">Error</span>(<span class="pl-s"><span class="pl-pds">'</span>skipped<span class="pl-pds">'</span></span>);
+});
+
+<span class="pl-smi">suite</span>.<span class="pl-en">todo</span>(<span class="pl-s"><span class="pl-pds">'</span>Test 3 - Coming Soon<span class="pl-pds">'</span></span>);
+
+<span class="pl-smi">suite</span>.<span class="pl-c1">test</span>(<span class="pl-s"><span class="pl-pds">'</span>Test 4<span class="pl-pds">'</span></span>, (<span class="pl-smi">t</span>, <span class="pl-smi">state</span>, <span class="pl-smi">done</span>) <span class="pl-k">=&gt;</span> {
+    <span class="pl-en">funcWithCallback</span>(done);
+});
+
+<span class="pl-smi">suite</span>.<span class="pl-en">failing</span>(<span class="pl-s"><span class="pl-pds">'</span>Test 5 - Need to fix this<span class="pl-pds">'</span></span>, <span class="pl-smi">t</span> <span class="pl-k">=&gt;</span> {
+    <span class="pl-smi">t</span>.<span class="pl-en">equal</span>(<span class="pl-c1">1</span><span class="pl-k">+</span><span class="pl-c1">1</span>, <span class="pl-c1">3</span>);
+});
+</pre></div>
+
+<p>Output:</p>
+
+<div class="highlight highlight-source-shell"><pre>----My Suite Name----
+pass 1 - Test 1
+skip 2 - Test 2
+todo 3 - Test 3 - Coming Soon
+pass 4 - Test 4
+fail 5 - Test 5 - Need to fix this <span class="pl-c">#failing test</span>
+
+Total: 3
+Failed: 1 (5)
+Passed: 2 67%
+
+
+Process finished with <span class="pl-c1">exit</span> code 0</pre></div>
+
+<h2>
+<a id="api" class="anchor" href="#api" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>API</h2>
+
+<h3>
+<a id="suite" class="anchor" href="#suite" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Suite</h3>
+
+<p>The first thing you do with <code>node-test</code> is create a suite for your tests.</p>
+
+<h5>
+<a id="new-suitename-options--suite-constructor" class="anchor" href="#new-suitename-options--suite-constructor" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>new Suite(name, [options])</code>- suite constructor</h5>
+
+<h6>
+<a id="arguments" class="anchor" href="#arguments" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Arguments</h6>
+
+<ul>
+<li>
+<code>name</code>: string - title for test</li>
+<li>
+<code>options</code>: object 
+
+<ul>
+<li>
+<code>failFast</code>: boolean (default: false) - if a single test fails, stop all remaining tests in the suite</li>
+</ul>
+</li>
+</ul>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">const</span> <span class="pl-c1">Suite</span> <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>node-test<span class="pl-pds">'</span></span>);
+
+<span class="pl-k">const</span> <span class="pl-c1">suite</span> <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">Suite</span>(<span class="pl-s"><span class="pl-pds">'</span>My Suite Name<span class="pl-pds">'</span></span>);</pre></div>
+
+<h4>
+<a id="concurrent-tests" class="anchor" href="#concurrent-tests" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Concurrent Tests</h4>
+
+<p>By default <code>node-test</code> runs tests concurrently. Concurrency means that the tests must be atomic. They should not depend on other tests for state.</p>
+
+<p>The following methods are used to create concurrent tests.</p>
+
+<h5>
+<a id="suitetestname-action---create-a-new-test" class="anchor" href="#suitetestname-action---create-a-new-test" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>suite.test(name, action)</code> - Create a new test.</h5>
+
+<h6>
+<a id="arguments-1" class="anchor" href="#arguments-1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Arguments</h6>
+
+<ul>
+<li>
+<code>name</code>: string - title for test</li>
+<li>
+<code>action</code>: function(t, state, done) - test implementation
+
+<ul>
+<li>
+<code>t</code>: object (built-in assertions)</li>
+<li>(optional) <code>state</code>: object - result of <code>beforeEach</code> hook</li>
+<li>(optional) <code>done</code>: function - callback for asynchronous tests</li>
+</ul>
+</li>
+</ul>
+
+<h6>
+<a id="test-resolution" class="anchor" href="#test-resolution" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Test Resolution</h6>
+
+<ul>
+<li>Any <code>Error</code> throw synchronously will cause the test to fail.</li>
+<li>Asynchronous test can return a Promise or use the <code>done()</code> callback.
+
+<ul>
+<li>If the test returns a Promise, the test will pass or fail if the promise resolves or rejects, respectively.</li>
+<li>If the <code>done()</code> callback is used, the test will fail if the first argument is defined. See <a href="https://nodejs.org/api/errors.html#errors_node_js_style_callbacks">Node.js style callbacks</a>.</li>
+</ul>
+</li>
+</ul>
+
+<h6>
+<a id="synchronous-test" class="anchor" href="#synchronous-test" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Synchronous Test:</h6>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-smi">suite</span>.<span class="pl-c1">test</span>(<span class="pl-s"><span class="pl-pds">'</span>My Test<span class="pl-pds">'</span></span>, <span class="pl-smi">t</span> <span class="pl-k">=&gt;</span> {
+    <span class="pl-k">const</span> <span class="pl-c1">result</span> <span class="pl-k">=</span> <span class="pl-en">funcReturnsNumber</span>();
+    <span class="pl-smi">t</span>.<span class="pl-en">equal</span>(result, <span class="pl-c1">2</span>);
+});</pre></div>
+
+<h6>
+<a id="asynchronous-test-with-promises" class="anchor" href="#asynchronous-test-with-promises" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Asynchronous Test with Promises:</h6>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-smi">suite</span>.<span class="pl-c1">test</span>(<span class="pl-s"><span class="pl-pds">'</span>My Test<span class="pl-pds">'</span></span>, <span class="pl-smi">t</span> <span class="pl-k">=&gt;</span> {
+    <span class="pl-k">return</span> <span class="pl-en">funcReturnsPromise</span>()
+        .<span class="pl-en">then</span>(<span class="pl-smi">result</span> <span class="pl-k">=&gt;</span> {
+            <span class="pl-smi">t</span>.<span class="pl-en">equal</span>(result, <span class="pl-c1">2</span>);
+        });
+});</pre></div>
+
+<h6>
+<a id="asynchronous-tests-with-a-callback" class="anchor" href="#asynchronous-tests-with-a-callback" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Asynchronous Tests with a Callback</h6>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-smi">suite</span>.<span class="pl-c1">test</span>(<span class="pl-s"><span class="pl-pds">'</span>My Test<span class="pl-pds">'</span></span>, (<span class="pl-smi">t</span>, <span class="pl-smi">state</span>, <span class="pl-smi">done</span>) <span class="pl-k">=&gt;</span> {
+    <span class="pl-en">funcWithCallback</span>((<span class="pl-smi">err</span>, <span class="pl-smi">result</span>) <span class="pl-k">=&gt;</span> {
+        <span class="pl-smi">t</span>.<span class="pl-en">noError</span>(err);
+        <span class="pl-smi">t</span>.<span class="pl-en">equal</span>(result, <span class="pl-c1">2</span>);
+    });
+});
+
+<span class="pl-smi">suite</span>.<span class="pl-c1">test</span>(<span class="pl-s"><span class="pl-pds">'</span>My Test 2<span class="pl-pds">'</span></span>, (<span class="pl-smi">t</span>, <span class="pl-smi">state</span>, <span class="pl-smi">done</span>) <span class="pl-k">=&gt;</span> {
+    <span class="pl-en">funcWithCallbackNoValue</span>(done);
+});</pre></div>
+
+<h5>
+<a id="suiteskipname-action---creates-a-new-test-that-will-be-skipped-when-the-suite-is-run" class="anchor" href="#suiteskipname-action---creates-a-new-test-that-will-be-skipped-when-the-suite-is-run" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>suite.skip(name, action)</code> - Creates a new test that will be skipped when the suite is run.</h5>
+
+<h6>
+<a id="arguments-2" class="anchor" href="#arguments-2" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Arguments</h6>
+
+<p>Same as <code>suite.test()</code>.</p>
+
+<h5>
+<a id="suiteonlyname-action---creates-a-new-test-that-will-be-run-exclusively" class="anchor" href="#suiteonlyname-action---creates-a-new-test-that-will-be-run-exclusively" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>suite.only(name, action)</code> - Creates a new test that will be run exclusively.</h5>
+
+<p>When the suite run, <code>only</code> tests will be run and all other tests will be skipped.</p>
+
+<h6>
+<a id="arguments-3" class="anchor" href="#arguments-3" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Arguments</h6>
+
+<p>Same as <code>suite.test()</code>.</p>
+
+<h5>
+<a id="suitetodoname---creates-a-test-placeholder" class="anchor" href="#suitetodoname---creates-a-test-placeholder" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>suite.todo(name)</code> - Creates a test placeholder.</h5>
+
+<p>The "test" will be shown in the output, but will not count toward the total.</p>
+
+<h6>
+<a id="arguments-4" class="anchor" href="#arguments-4" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Arguments</h6>
+
+<ul>
+<li>
+<code>name</code>: string - title for test</li>
+</ul>
+
+<h5>
+<a id="suitefailingname-action---creates-a-new-test-that-is-expected-to-fail" class="anchor" href="#suitefailingname-action---creates-a-new-test-that-is-expected-to-fail" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>suite.failing(name, action)</code> - Creates a new test that is expected to fail.</h5>
+
+<p>The test included as a failed test in the output, but don't cause the exit code to change (indicating the build failed).</p>
+
+<h6>
+<a id="arguments-5" class="anchor" href="#arguments-5" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Arguments</h6>
+
+<p>Same as <code>suite.test()</code>.</p>
+
+<h4>
+<a id="serial-tests" class="anchor" href="#serial-tests" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Serial Tests</h4>
+
+<p><code>node-test</code> also supports serial tests (one at a time). Most of the time concurrent test are preferable, however there are times (such as when accessing a database) that you may want tests to run serially.</p>
+
+<p>Within a suite, serial tests are executed first followed by any concurrent tests. However, multiple suites are run concurrently. So two serial tests could run at the same time if they are members of different suites.</p>
+
+<p>The following methods are used to create serial tests. There usage is identical to the equivalent concurrent method.</p>
+
+<h5>
+<a id="suiteserialtestname-action" class="anchor" href="#suiteserialtestname-action" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>suite.serial.test(name, action)</code>
+</h5>
+
+<h6>
+<a id="arguments-6" class="anchor" href="#arguments-6" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Arguments</h6>
+
+<p>Same as <code>suite.test()</code>.</p>
+
+<h5>
+<a id="suiteserialskipname-action" class="anchor" href="#suiteserialskipname-action" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>suite.serial.skip(name, action)</code>
+</h5>
+
+<h6>
+<a id="arguments-7" class="anchor" href="#arguments-7" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Arguments</h6>
+
+<p>Same as <code>suite.test()</code>.</p>
+
+<h5>
+<a id="suiteserialonlyname-action" class="anchor" href="#suiteserialonlyname-action" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>suite.serial.only(name, action)</code>
+</h5>
+
+<h6>
+<a id="arguments-8" class="anchor" href="#arguments-8" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Arguments</h6>
+
+<p>Same as <code>suite.test()</code>.</p>
+
+<h5>
+<a id="suiteserialtodoname" class="anchor" href="#suiteserialtodoname" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>suite.serial.todo(name)</code>
+</h5>
+
+<h6>
+<a id="arguments-9" class="anchor" href="#arguments-9" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Arguments</h6>
+
+<p>Same as <code>suite.test()</code>.</p>
+
+<h5>
+<a id="suiteserialfailingname-action" class="anchor" href="#suiteserialfailingname-action" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>suite.serial.failing(name, action)</code>
+</h5>
+
+<h6>
+<a id="arguments-10" class="anchor" href="#arguments-10" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Arguments</h6>
+
+<p>Same as <code>suite.test()</code>.</p>
+
+<h3>
+<a id="hooks" class="anchor" href="#hooks" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Hooks</h3>
+
+<p><code>node-test</code> provides four hooks. The hooks are run serially to the tests.</p>
+
+<h4>
+<a id="suitebeforeaction---run-before-all-tests-in-the-suite" class="anchor" href="#suitebeforeaction---run-before-all-tests-in-the-suite" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>suite.before(action)</code> - Run before all tests in the suite.</h4>
+
+<h6>
+<a id="arguments-11" class="anchor" href="#arguments-11" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Arguments</h6>
+
+<ul>
+<li>
+<code>name</code>: string - title for test</li>
+<li>
+<code>action</code>: function(t, state, done) - test implementation
+
+<ul>
+<li>
+<code>t</code>: object (built-in assertions)</li>
+<li>(optional) <code>done</code>: function - callback for asynchronous tests</li>
+</ul>
+</li>
+</ul>
+
+<h4>
+<a id="suiteafteraction---run-after-all-tests-in-the-suite" class="anchor" href="#suiteafteraction---run-after-all-tests-in-the-suite" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>suite.after(action)</code> - Run after all tests in the suite.</h4>
+
+<h6>
+<a id="arguments-12" class="anchor" href="#arguments-12" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Arguments</h6>
+
+<p>Same as <code>suite.before()</code>.</p>
+
+<h4>
+<a id="suitebeforeeachaction---run-before-each-individual-tests-in-the-suite" class="anchor" href="#suitebeforeeachaction---run-before-each-individual-tests-in-the-suite" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>suite.beforeEach(action)</code> - Run before each individual tests in the suite.</h4>
+
+<h6>
+<a id="arguments-13" class="anchor" href="#arguments-13" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Arguments</h6>
+
+<p>Same as <code>suite.before()</code>.</p>
+
+<p>The <code>beforeEach</code> hook runs before each test in the suite.</p>
+
+<h6>
+<a id="usage-with-suitebeforeeach" class="anchor" href="#usage-with-suitebeforeeach" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage with <code>suite.beforeEach()</code>
+</h6>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-smi">suite</span>.<span class="pl-en">beforeEach</span>(<span class="pl-smi">t</span> <span class="pl-k">=&gt;</span> {
+    <span class="pl-k">return</span> {
+        data<span class="pl-k">:</span> <span class="pl-c1">2</span>
+    };
+});
+
+<span class="pl-smi">suite</span>.<span class="pl-c1">test</span>(<span class="pl-s"><span class="pl-pds">'</span>My Test 1<span class="pl-pds">'</span></span>, (<span class="pl-smi">t</span>, <span class="pl-smi">state</span>) <span class="pl-k">=&gt;</span> {
+    <span class="pl-smi">t</span>.<span class="pl-en">equal</span>(<span class="pl-c1">1</span><span class="pl-k">+</span><span class="pl-c1">1</span>, <span class="pl-smi">state</span>.<span class="pl-c1">data</span>);
+    <span class="pl-smi">state</span>.<span class="pl-smi">date</span> <span class="pl-k">=</span> <span class="pl-c1">3</span>;
+});
+
+<span class="pl-smi">suite</span>.<span class="pl-c1">test</span>(<span class="pl-s"><span class="pl-pds">'</span>My Test 2<span class="pl-pds">'</span></span>, (<span class="pl-smi">t</span>, <span class="pl-smi">state</span>) <span class="pl-k">=&gt;</span> {
+    <span class="pl-smi">t</span>.<span class="pl-en">equal</span>(<span class="pl-c1">2</span>, <span class="pl-smi">state</span>.<span class="pl-c1">data</span>); <span class="pl-c">//state is still 2, because beforeEach is run individual for each test</span>
+});</pre></div>
+
+<h4>
+<a id="suiteaftereachaction---run-after-each-individual-tests-in-the-suite" class="anchor" href="#suiteaftereachaction---run-after-each-individual-tests-in-the-suite" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>suite.afterEach(action)</code> - Run after each individual tests in the suite.</h4>
+
+<h6>
+<a id="arguments-14" class="anchor" href="#arguments-14" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Arguments</h6>
+
+<p>Same as <code>suite.before()</code>.</p>
+
+<h4>
+<a id="other-members" class="anchor" href="#other-members" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Other Members</h4>
+
+<h5>
+<a id="suitesettimeoutdelay---set-the-time-limit-for-tests-default-5000" class="anchor" href="#suitesettimeoutdelay---set-the-time-limit-for-tests-default-5000" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>suite.setTimeout(delay)</code> - Set the time limit for tests (default: 5000)</h5>
+
+<p>Tests whose execution time exceeds the delay will fail.</p>
+
+<h6>
+<a id="arguments-15" class="anchor" href="#arguments-15" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Arguments</h6>
+
+<ul>
+<li>
+<code>delay</code>: number - timeout in milliseconds</li>
+</ul>
+
+<h3>
+<a id="t-built-in-assertion-library" class="anchor" href="#t-built-in-assertion-library" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>t (Built-In Assertion Library)</h3>
+
+<p><code>node-test</code> includes an assertion library that is a bit more feature rich than the core assert module.</p>
+
+<ul>
+<li>For every method, <code>message</code> is optional. If defined, it will be displayed if the assertion fails.*</li>
+</ul>
+
+<h4>
+<a id="tpass" class="anchor" href="#tpass" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>t.pass()</code>
+</h4>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-smi">t</span>.<span class="pl-en">pass</span>();</pre></div>
+
+<h4>
+<a id="tfailmessage" class="anchor" href="#tfailmessage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>t.fail([message])</code>
+</h4>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-smi">t</span>.<span class="pl-en">fail</span>();</pre></div>
+
+<h4>
+<a id="ttruevalue-message" class="anchor" href="#ttruevalue-message" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>t.true(value, [message])</code>
+</h4>
+
+<p>An assertion that <code>value</code> is strictly true.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">const</span> <span class="pl-c1">value</span> <span class="pl-k">=</span> <span class="pl-c1">true</span>;
+<span class="pl-smi">t</span>.<span class="pl-en">true</span>(value);
+
+<span class="pl-k">const</span> <span class="pl-c1">arr</span> <span class="pl-k">=</span> [<span class="pl-s"><span class="pl-pds">'</span>a<span class="pl-pds">'</span></span>];
+<span class="pl-smi">t</span>.<span class="pl-en">true</span>(<span class="pl-smi">arr</span>.<span class="pl-c1">length</span> <span class="pl-k">===</span> <span class="pl-c1">1</span>);</pre></div>
+
+<h4>
+<a id="tfalsevalue-message" class="anchor" href="#tfalsevalue-message" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>t.false(value, [message])</code>
+</h4>
+
+<p>An assertion that <code>value</code> is strictly false.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">const</span> <span class="pl-c1">value</span> <span class="pl-k">=</span> <span class="pl-c1">false</span>;
+<span class="pl-smi">t</span>.<span class="pl-en">false</span>(value);</pre></div>
+
+<h4>
+<a id="ttruthyvalue-message-alias-tassert" class="anchor" href="#ttruthyvalue-message-alias-tassert" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>t.truthy(value, [message])</code> alias: <code>t.assert()</code>
+</h4>
+
+<p>An assertion that <code>value</code> is strictly truthy.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">const</span> <span class="pl-c1">value</span> <span class="pl-k">=</span> <span class="pl-c1">1</span>;
+<span class="pl-smi">t</span>.<span class="pl-en">truthy</span>(value);</pre></div>
+
+<h4>
+<a id="tfalseyvalue-message" class="anchor" href="#tfalseyvalue-message" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>t.falsey(value, [message])</code>
+</h4>
+
+<p>An assertion that <code>value</code> is strictly falsey.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">const</span> <span class="pl-c1">value</span> <span class="pl-k">=</span> <span class="pl-c1">0</span>;
+<span class="pl-smi">t</span>.<span class="pl-en">falsey</span>(value);</pre></div>
+
+<h4>
+<a id="tequalvalue-expected-message-aliases-tis-tequals" class="anchor" href="#tequalvalue-expected-message-aliases-tis-tequals" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>t.equal(value, expected, [message])</code> aliases: <code>t.is(), t.equals()</code>
+</h4>
+
+<p>An assertion that <code>value</code> is strictly equal to <code>expected</code>.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">const</span> <span class="pl-c1">value</span> <span class="pl-k">=</span> <span class="pl-c1">1</span>;
+<span class="pl-smi">t</span>.<span class="pl-en">equal</span>(value, <span class="pl-c1">1</span>);</pre></div>
+
+<h4>
+<a id="tnotequalvalue-expected-message-aliases-tnot-tnotequals" class="anchor" href="#tnotequalvalue-expected-message-aliases-tnot-tnotequals" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>t.notEqual(value, expected, [message])</code> aliases: <code>t.not(), t.notEquals()</code>
+</h4>
+
+<p>An assertion that <code>value</code> is strictly not equal to <code>expected</code>.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">const</span> <span class="pl-c1">value</span> <span class="pl-k">=</span> <span class="pl-c1">1</span>;
+<span class="pl-smi">t</span>.<span class="pl-en">notEqual</span>(value, <span class="pl-c1">2</span>);</pre></div>
+
+<h4>
+<a id="tdeepequalvalue-expected-message" class="anchor" href="#tdeepequalvalue-expected-message" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>t.deepEqual(value, expected, [message])</code>
+</h4>
+
+<p>An assertion that <code>value</code> is strictly and deeply equal to <code>expected</code>. Deep equality is tested by the <a href="https://github.com/sotojuan/not-so-shallow">not-so-shallow</a> module.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">const</span> <span class="pl-c1">value</span> <span class="pl-k">=</span> { data<span class="pl-k">:</span> <span class="pl-c1">1234</span> };
+<span class="pl-smi">t</span>.<span class="pl-en">deepEqual</span>(value, { data<span class="pl-k">:</span> <span class="pl-c1">1234</span> });</pre></div>
+
+<h4>
+<a id="tnotdeepequalvalue-expected-message" class="anchor" href="#tnotdeepequalvalue-expected-message" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>t.notDeepEqual(value, expected, [message])</code>
+</h4>
+
+<p>An assertion that <code>value</code> is strictly and deeply not equal to <code>expected</code>.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">const</span> <span class="pl-c1">value</span> <span class="pl-k">=</span> { data<span class="pl-k">:</span> <span class="pl-c1">1234</span> };
+<span class="pl-smi">t</span>.<span class="pl-en">notDeepEqual</span>(value, { data<span class="pl-k">:</span> <span class="pl-c1">5678</span> });</pre></div>
+
+<h4>
+<a id="tgreaterthanvalue-expected-message" class="anchor" href="#tgreaterthanvalue-expected-message" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>t.greaterThan(value, expected, [message])</code>
+</h4>
+
+<p>An assertion that <code>value</code> is greater than <code>expected</code>.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">const</span> <span class="pl-c1">value</span> <span class="pl-k">=</span> <span class="pl-c1">2</span>;
+<span class="pl-smi">t</span>.<span class="pl-en">greaterThan</span>(value, <span class="pl-c1">1</span>);</pre></div>
+
+<h4>
+<a id="tgreaterthanorequalvalue-expected-message" class="anchor" href="#tgreaterthanorequalvalue-expected-message" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>t.greaterThanOrEqual(value, expected, [message])</code>
+</h4>
+
+<p>An assertion that <code>value</code> is greater than or equal to <code>expected</code>.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">const</span> <span class="pl-c1">value</span> <span class="pl-k">=</span> <span class="pl-c1">2</span>;
+<span class="pl-smi">t</span>.<span class="pl-en">greaterThanOrEqual</span>(value, <span class="pl-c1">2</span>);</pre></div>
+
+<h4>
+<a id="tlessthanvalue-expected-message" class="anchor" href="#tlessthanvalue-expected-message" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>t.lessThan(value, expected, [message])</code>
+</h4>
+
+<p>An assertion that <code>value</code> is less than <code>expected</code>.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">const</span> <span class="pl-c1">value</span> <span class="pl-k">=</span> <span class="pl-c1">1</span>;
+<span class="pl-smi">t</span>.<span class="pl-en">lessThan</span>(value, <span class="pl-c1">2</span>);</pre></div>
+
+<h4>
+<a id="tlessthanorequalvalue-expected-message" class="anchor" href="#tlessthanorequalvalue-expected-message" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>t.lessThanOrEqual(value, expected, [message])</code>
+</h4>
+
+<p>An assertion that <code>value</code> is less than or equal to <code>expected</code>. *<code>message</code> is optional. If defined, it will be displayed if the assertion fails.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">const</span> <span class="pl-c1">value</span> <span class="pl-k">=</span> <span class="pl-c1">1</span>;
+<span class="pl-smi">t</span>.<span class="pl-en">lessThanOrEqual</span>(value, <span class="pl-c1">1</span>);</pre></div>
+
+<h4>
+<a id="tnoerrorerror-message" class="anchor" href="#tnoerrorerror-message" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>t.noError(error, [message])</code>
+</h4>
+
+<p>An assertion that <code>error</code> is falsey. This is functionally similar to <code>t.falsey()</code>, but the assertion error message indicates the failure was due to an <code>Error</code>.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-en">funcWithCallback</span>((<span class="pl-smi">err</span>, <span class="pl-smi">result</span>) <span class="pl-k">=&gt;</span> {
+    <span class="pl-smi">t</span>.<span class="pl-en">noError</span>(err);
+});</pre></div>
+
+<h4>
+<a id="tnotthrowsfn-message" class="anchor" href="#tnotthrowsfn-message" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>t.notThrows(fn, [message])</code>
+</h4>
+
+<p>An assertion that <code>fn</code> is function that does not throws an Error synchronously nor asynchronously (via Promise or callback).</p>
+
+<h6>
+<a id="arguments-16" class="anchor" href="#arguments-16" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Arguments</h6>
+
+<ul>
+<li>
+<code>fn</code>: function([done]) - code to assert throws
+
+<ul>
+<li>(optional) <code>done</code>: function - callback for asynchronous test</li>
+</ul>
+</li>
+</ul>
+
+<h6>
+<a id="synchronous-assertion" class="anchor" href="#synchronous-assertion" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Synchronous Assertion</h6>
+
+<p>Would Pass:</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-smi">t</span>.<span class="pl-en">notThrows</span>(() <span class="pl-k">=&gt;</span> {
+    <span class="pl-smi">t</span>.<span class="pl-en">equal</span>(<span class="pl-c1">1</span>, <span class="pl-c1">1</span>);
+});</pre></div>
+
+<p>Would Fail:</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-smi">t</span>.<span class="pl-en">throws</span>(() <span class="pl-k">=&gt;</span> {
+    <span class="pl-k">throw</span> <span class="pl-k">new</span> <span class="pl-en">Error</span>(<span class="pl-s"><span class="pl-pds">'</span>error<span class="pl-pds">'</span></span>);
+});</pre></div>
+
+<h6>
+<a id="asynchronous-assertion-with-promises" class="anchor" href="#asynchronous-assertion-with-promises" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Asynchronous Assertion with Promises</h6>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-smi">t</span>.<span class="pl-en">notThrows</span>(() <span class="pl-k">=&gt;</span> {
+    <span class="pl-k">return</span> <span class="pl-en">funcReturnsPromise</span>();
+});</pre></div>
+
+<h6>
+<a id="asynchronoussynchronous-assertion-with-callback" class="anchor" href="#asynchronoussynchronous-assertion-with-callback" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Asynchronous/Synchronous Assertion with Callback</h6>
+
+<p>The callback can be asynchronous or synchronous. The callback can be executed immediately or later. It will be handled the same.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-smi">t</span>.<span class="pl-en">notThrows</span>(<span class="pl-smi">done1</span> <span class="pl-k">=&gt;</span> {
+    <span class="pl-en">funcWithAsyncCallback</span>(done1);
+});
+<span class="pl-smi">t</span>.<span class="pl-en">notThrows</span>(<span class="pl-smi">done1</span> <span class="pl-k">=&gt;</span> {
+    <span class="pl-en">funcWithSyncCallback</span>(done1);
+});
+<span class="pl-smi">t</span>.<span class="pl-en">notThrows</span>(<span class="pl-smi">done1</span> <span class="pl-k">=&gt;</span> {
+    <span class="pl-en">funcWithCallback</span>((<span class="pl-smi">err</span>, <span class="pl-smi">result</span>) <span class="pl-k">=&gt;</span> {
+        <span class="pl-smi">t</span>.<span class="pl-en">noError</span>(err);
+        <span class="pl-smi">t</span>.<span class="pl-en">equal</span>(result, <span class="pl-c1">2</span>);
+        <span class="pl-en">done1</span>();
+    });
+});</pre></div>
+
+<p>Even if an asynchronous mode is used, synchronous errors are caught.</p>
+
+<h6>
+<a id="mixed-synchronous--asynchronous" class="anchor" href="#mixed-synchronous--asynchronous" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Mixed Synchronous &amp; Asynchronous</h6>
+
+<p>Would Fail:</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-smi">t</span>.<span class="pl-en">notThrows</span>(<span class="pl-smi">done</span> <span class="pl-k">=&gt;</span> {
+    <span class="pl-en">funcWithAsyncCallback</span>(done);
+    <span class="pl-k">throw</span> <span class="pl-k">new</span> <span class="pl-en">Error</span>(<span class="pl-s"><span class="pl-pds">'</span>message<span class="pl-pds">'</span></span>);
+});
+<span class="pl-smi">t</span>.<span class="pl-en">notThrows</span>(<span class="pl-smi">done</span> <span class="pl-k">=&gt;</span> {
+    <span class="pl-k">throw</span> <span class="pl-k">new</span> <span class="pl-en">Error</span>(<span class="pl-s"><span class="pl-pds">'</span>message<span class="pl-pds">'</span></span>);
+    <span class="pl-k">return</span> <span class="pl-en">funcReturnsPromise</span>();
+});</pre></div>
+
+<h4>
+<a id="tthrowsfn-errtestfn-message" class="anchor" href="#tthrowsfn-errtestfn-message" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>t.throws(fn, [errTestFn], [message])</code>
+</h4>
+
+<p>An assertion that <code>fn</code> is function that either throws an Error synchronously or asynchronously (via Promise or callback).</p>
+
+<h6>
+<a id="arguments-17" class="anchor" href="#arguments-17" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Arguments</h6>
+
+<ul>
+<li>
+<code>fn</code>: function([done]) - code to assert throws
+
+<ul>
+<li>(optional) <code>done</code>: function - callback for asynchronous test</li>
+</ul>
+</li>
+<li>
+<code>errTestFn</code>: function() - code to test the error</li>
+</ul>
+
+<p>Except for the <code>errTestFn</code> argument, this functions as the opposite of <code>t.notThrow()</code>. That is <code>throws</code> passes when there is an Error rather passing when there is no Error. For more usage details, look at the <code>notThrows</code> examples.</p>
+
+<p>Passing <code>errTestFn</code> allows testing that the Error received is the Error expected.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-smi">t</span>.<span class="pl-en">throws</span>(() <span class="pl-k">=&gt;</span> {
+    <span class="pl-k">return</span> <span class="pl-en">funcReturnsPromise</span>();
+},
+<span class="pl-smi">err</span> <span class="pl-k">=&gt;</span> {
+    <span class="pl-smi">t</span>.<span class="pl-en">true</span>(err <span class="pl-k">instanceof</span> TypeError);
+    <span class="pl-smi">t</span>.<span class="pl-en">equal</span>(<span class="pl-smi">err</span>.<span class="pl-smi">message</span>, <span class="pl-s"><span class="pl-pds">'</span>invalid argument<span class="pl-pds">'</span></span>);
+});</pre></div>
+
+<h4>
+<a id="tcountfn-count-message" class="anchor" href="#tcountfn-count-message" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>t.count(fn, count, [message])</code>
+</h4>
+
+<p>An asynchronous assertion that <code>fn</code> eventually executes a callback a precise number of times.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-smi">t</span>.<span class="pl-en">count</span>(<span class="pl-smi">done1</span> <span class="pl-k">=&gt;</span> {
+    <span class="pl-en">funcWithCallback</span>(done1);
+    <span class="pl-en">funcWithCallback</span>(done1);
+    <span class="pl-en">funcWithCallback</span>(done1);
+}, <span class="pl-c1">3</span>);</pre></div>
+
+<h2>
+<a id="running-multiple-suites" class="anchor" href="#running-multiple-suites" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Running Multiple Suites</h2>
+
+<p>There are couple ways to run multiple suites.
+1. The easiest (and least flexible) way to just place multiple suites in a single file.
+2. A more flexible way is to create one suite per file and create an index file to run them all.</p>
+
+<pre><code>Imagine your `test` directory looks like this:
+```
+suite1.js
+suite2.js
+suite3.js
+```
+
+You could create a file called `index.js` with these contents:
+```javascript
+'use strict';
+require('./suite1');
+require('./suite2');
+require('./suite3');
+```
+
+Then add the script to your `package.json` file:
+```json
+"scripts": {
+  "test": "node test/index.js"
+}
+```
+
+Now you can run individual suites or the whole thing from the command line.
+```shell
+node tests/suite1.js
+npm test
+```
+</code></pre>
+
+<ol>
+<li>The up coming CLI will make it easier to execute multiple suites without needing to maintain an <code>index.js</code>.</li>
+</ol>
+
+<h2>
+<a id="todo" class="anchor" href="#todo" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Todo</h2>
+
+<ul>
+<li>CLI 
+
+<ul>
+<li>file watcher</li>
+<li>only run certain files (glob matching)</li>
+<li>run suites in individual contexts</li>
+<li>harmony flag</li>
+</ul>
+</li>
+<li>js-report support</li>
+<li>test Error output</li>
+</ul>
+
+<h2>
+<a id="considering" class="anchor" href="#considering" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Considering</h2>
+
+<ul>
+<li>code coverage</li>
+<li>slow tests</li>
+<li>logging - ala Karma</li>
+<li>support CoffeeScript, TypeScript</li>
+<li>support plugins</li>
+</ul>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">node-test maintained by <a href="https://github.com/ben-page">ben-page</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
