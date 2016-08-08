@@ -9,61 +9,63 @@ const assert = require('assert');
 
 function suite1() {
     const suite = new Suite('General Testing');
-    
+
     suite.test('t.is()', t => {
         t.is(1, 1);
         t.throws(() => {
             t.is(1, 5);
         });
     });
-    
-    suite.todo('something todo', t => {
+
+    suite.todo('something todo', () => {
         assert(false);
     });
-    
-    suite.skip('skipped', t => {
+
+    suite.skip('skipped', () => {
         assert(false);
     });
-    
-    suite.failing('fail()', t => {
-        t.fail('something bad happened');
+
+    suite.test('fail()', t => {
+        t.throws(() => {
+            t.fail('something bad happened');
+        });
     });
-    
+
     suite.test('t.not()', t => {
         t.not(1, 5);
         t.throws(() => {
             t.not(1, 1);
         });
     });
-    
+
     suite.test('t.true()', t => {
         t.true(true);
         t.throws(() => {
             t.true(false);
         });
     });
-    
+
     suite.test('t.false()', t => {
         t.false(false);
         t.throws(() => {
             t.false(true);
         });
     });
-    
+
     suite.test('t.truthy()', t => {
         t.truthy(1);
         t.throws(() => {
             t.truthy(0);
         });
     });
-    
+
     suite.test('t.falsey()', t => {
         t.falsey(0);
         t.throws(() => {
             t.falsey(1);
         });
     });
-    
+
     suite.test('t.deepEqual()', t => {
         t.deepEqual(
             {
@@ -102,66 +104,70 @@ function suite1() {
                 });
         });
     });
-    
+
     suite.test('t.notDeepEqual()', t => {
         t.notDeepEqual({a: 123}, {a: 1234});
         t.throws(() => {
             t.notDeepEqual({a: 123}, {a: 123});
         });
     });
-    
+
     suite.test('t.greaterThan()', t => {
         t.greaterThan(5, 1);
         t.throws(() => {
             t.greaterThan(5, 10);
         });
     });
-    
+
     suite.test('t.greaterThanOrEqual()', t => {
         t.greaterThanOrEqual(5, 5);
         t.throws(() => {
             t.greaterThanOrEqual(5, 10);
         });
     });
-    
+
     suite.test('t.lessThan()', t => {
         t.lessThan(5, 10);
         t.throws(() => {
             t.lessThan(5, 1);
         });
     });
-    
+
     suite.test('t.lessThanOrEqual()', t => {
         t.lessThanOrEqual(5, 5);
         t.throws(() => {
             t.lessThanOrEqual(5, 1);
         });
     });
-    
+
     suite.test('done()', (t, state, done) => {
         setTimeout(() => {
             done();
         }, 200);
     });
-    
+
     suite.test('t.throws() synchronous', t => {
         t.throws(() => {
             throw new Error('error');
         });
     });
-    
+
     suite.test('t.throws() asynchronous', t => {
         t.throws(() => {
             return Promise.delay(100).return(Promise.reject(new Error('error')));
         });
     });
-    
-    suite.failing('t.throws() failures', t => {
+
+    suite.test('t.throws() failures', t => {
         t.throws(() => {
             return Promise.delay(100).return(Promise.resolve(true));
         });
+
+        t.failure(() => {
+            t.pass();
+        });
     });
-    
+
     suite.test('t.throws() nested', t => {
         t.throws(() => {
             t.throws(() => {
@@ -169,7 +175,7 @@ function suite1() {
             });
         });
     });
-    
+
     suite.test('t.throws() with test', t => {
         t.throws(() => {
             throw new Error('error')
@@ -179,31 +185,33 @@ function suite1() {
             t.equal(err.message, 'error');
         });
     });
-    
+
     suite.test('t.throws() - with callback', t => {
         t.throws(done => {
             done();
         });
     });
-    
-    suite.failing('t.throws() - with callback error', t => {
-        t.throws(done => {
-            done(new Error('error'));
+
+    suite.test('t.throws() - with callback error', t => {
+        t.throws(() => {
+            t.throws(done => {
+                done(new Error('error'));
+            });
         });
     });
-    
+
     suite.test('t.notThrows() synchronous', t => {
         t.notThrows(() => {
             //no error
         });
     });
-    
+
     suite.test('t.notThrows() asynchronous', t => {
         t.notThrows(() => {
             return Promise.delay(100).return(Promise.resolve(true));
         });
     });
-    
+
     suite.test('t.notThrows() nested', t => {
         t.notThrows(() => {
             //no error
@@ -214,47 +222,51 @@ function suite1() {
             });
         });
     });
-    
+
     suite.test('t.noError()', t => {
-        
+
         function callbackWithError(cb) {
             cb(new Error());
         }
-        
+
         function callbackWithoutError(cb) {
             cb(undefined);
         }
-    
+
         callbackWithoutError(t.noError);
         t.throws(() => {
             callbackWithError(t.noError);
         });
     });
-    
+
     suite.test('t.count() - Count Pass', t => {
         t.count(done => {
             done();
             done();
         }, 2);
     });
-    
-    suite.failing('t.count() - Count Fail', t => {
+
+    suite.test('t.count() - Count Fail', t => {
         t.count(done => {
             done();
             done();
             done();
         }, 2);
+
+        t.failure(() => {
+            t.assert(true);
+        })
     });
 }
 
 function suite2() {
     const suite = new Suite('Testing suite level hooks');
-    
+
     let beforeAll = false;
     let testsCreated = 0;
     let testsComplete = 0;
     let afterAll = false;
-    
+
     suite.before(t => {
         beforeAll = true;
         assert(t.equals);
@@ -262,19 +274,19 @@ function suite2() {
         t.equal(testsCreated, 0);
         t.equal(testsComplete, 0);
     });
-    
+
     suite.test('pass 1', t => {
         testsCreated++;
         t.is(1, 1);
         testsComplete++;
     });
-    
+
     suite.test('pass 2', t => {
         testsCreated++;
         t.is(2, 2);
         testsComplete++;
     });
-    
+
     suite.after(t => {
         t.true(beforeAll);
         t.false(afterAll);
@@ -286,27 +298,27 @@ function suite2() {
 
 function suite3() {
     const suite = new Suite('Testing .only()');
-    
+
     let testsCreated = 0;
     let testsComplete = 0;
-    
+
     suite.before(t => {
         t.equal(testsCreated, 0);
         t.equal(testsComplete, 0);
     });
-    
+
     suite.test('fail', t => {
         testsCreated++;
         t.is(1, 2);
         testsComplete++;
     });
-    
+
     suite.only('pass', t => {
         testsCreated++;
         t.is(1, 1);
         testsComplete++;
     });
-    
+
     suite.after(t => {
         t.equal(testsCreated, 1);
         t.equal(testsComplete, 1);
@@ -315,31 +327,31 @@ function suite3() {
 
 function suite4() {
     const suite = new Suite('beforeEach & afterEach');
-    
+
     let one, two;
-    
-    suite.beforeEach(t => {
+
+    suite.beforeEach(() => {
         return { init: true };
     });
-    
+
     suite.afterEach((t, state) => {
         state.complete = true;
     });
-    
+
     suite.test('first', (t, state) => {
         t.equal(state.init, true);
         t.falsey(state.complete);
         one = state;
         state.start = true;
     });
-    
+
     suite.test('second', (t, state) => {
         t.equal(state.init, true);
         t.falsey(state.complete);
         two = state;
         state.start = true;
     });
-    
+
     suite.after(t => {
         t.equal(one.init, true);
         t.equal(one.start, true);
@@ -352,30 +364,30 @@ function suite4() {
 
 function suite5() {
     const suite = new Suite('asynchronous & serial');
-    
+
     let count = 1;
-    
+
     suite.test('asynchronous test', t => {
         return Promise.delay(10)
             .then(() => {
                 t.equal(count++, 3);
             });
     });
-    
+
     suite.serial.test('serial 1', t => {
         return Promise.delay(300)
             .then(() => {
                 t.equal(count++, 1);
             });
     });
-    
+
     suite.serial.test('serial 2', t => {
         return Promise.delay(100)
             .then(() => {
                 t.equal(count++, 2);
             });
     });
-    
+
     suite.after(t => {
         t.equal(count, 4);
     })
@@ -384,18 +396,22 @@ function suite5() {
 function suite6() {
     const suite = new Suite('timeout tests');
     suite.setTimeout(1000);
-    
-    suite.test('pass', t => {
+
+    suite.test('no time out', t => {
         t.notThrows(() => {
             return Promise.delay(800);
         });
     });
-    
+
     //this is not a great way to test this. it's not really testing for the timeout, just a failure.
-    suite.failing('fail', t => {
+    suite.test('timed out', t => {
         t.notThrows(() => {
             return Promise.delay(1200);
         });
+
+        t.failure(err => {
+            t.assert(err.message, 'Timed Out');
+        })
     });
 }
 
