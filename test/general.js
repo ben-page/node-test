@@ -1,0 +1,257 @@
+'use strict';
+const Promise = require('bluebird');
+Promise.config({
+    warnings: true,
+    longStackTraces: true
+});
+const Suite = require('../lib/suite');
+
+const suite = new Suite('General Testing');
+
+suite.test('t.is()', t => {
+    t.is(1, 1);
+    t.throws(() => {
+        t.is(1, 5);
+    });
+});
+
+suite.todo('something todo', () => {
+    assert(false);
+});
+
+suite.skip('skipped', () => {
+    assert(false);
+});
+
+suite.test('fail()', t => {
+    t.throws(() => {
+        t.fail('something bad happened');
+    });
+});
+
+suite.test('t.not()', t => {
+    t.not(1, 5);
+    t.throws(() => {
+        t.not(1, 1);
+    });
+});
+
+suite.test('t.true()', t => {
+    t.true(true);
+    t.throws(() => {
+        t.true(false);
+    });
+});
+
+suite.test('t.false()', t => {
+    t.false(false);
+    t.throws(() => {
+        t.false(true);
+    });
+});
+
+suite.test('t.truthy()', t => {
+    t.truthy(1);
+    t.throws(() => {
+        t.truthy(0);
+    });
+});
+
+suite.test('t.falsey()', t => {
+    t.falsey(0);
+    t.throws(() => {
+        t.falsey(1);
+    });
+});
+
+suite.test('t.deepEqual()', t => {
+    t.deepEqual(
+        {
+            a: {
+                b: 123,
+                c: [
+                    new Date(2016, 1, 1, 1, 1, 1)
+                ]
+            }
+        },
+        {
+            a: {
+                b: 123,
+                c: [
+                    new Date(2016, 1, 1, 1, 1, 1)
+                ]
+            }
+        });
+    t.throws(() => {
+        t.deepEqual(
+            {
+                a: {
+                    b: 123,
+                    c: [
+                        new Date(2016, 1, 1, 1, 1, 1)
+                    ]
+                }
+            },
+            {
+                a: {
+                    b: 1234,
+                    c: [
+                        new Date(2016, 1, 1, 1, 1, 1)
+                    ]
+                }
+            });
+    });
+});
+
+suite.test('t.notDeepEqual()', t => {
+    t.notDeepEqual({a: 123}, {a: 1234});
+    t.throws(() => {
+        t.notDeepEqual({a: 123}, {a: 123});
+    });
+});
+
+suite.test('t.greaterThan()', t => {
+    t.greaterThan(5, 1);
+    t.throws(() => {
+        t.greaterThan(5, 10);
+    });
+});
+
+suite.test('t.greaterThanOrEqual()', t => {
+    t.greaterThanOrEqual(5, 5);
+    t.throws(() => {
+        t.greaterThanOrEqual(5, 10);
+    });
+});
+
+suite.test('t.lessThan()', t => {
+    t.lessThan(5, 10);
+    t.throws(() => {
+        t.lessThan(5, 1);
+    });
+});
+
+suite.test('t.lessThanOrEqual()', t => {
+    t.lessThanOrEqual(5, 5);
+    t.throws(() => {
+        t.lessThanOrEqual(5, 1);
+    });
+});
+
+suite.test('done()', (t, state, done) => {
+    setTimeout(() => {
+        done();
+    }, 200);
+});
+
+suite.test('t.throws() synchronous', t => {
+    t.throws(() => {
+        throw new Error('error');
+    });
+});
+
+suite.test('t.throws() asynchronous', t => {
+    t.throws(() => {
+        return Promise.delay(100).return(Promise.reject(new Error('error')));
+    });
+});
+
+suite.test('t.throws() failures', t => {
+    t.throws(() => {
+        return Promise.delay(100).return(Promise.resolve(true));
+    });
+
+    t.failure(() => {
+        t.pass();
+    });
+});
+
+suite.test('t.throws() nested', t => {
+    t.throws(() => {
+        t.throws(() => {
+            //no error, so first t.throws() asserts
+        });
+    });
+});
+
+suite.test('t.throws() with test', t => {
+    t.throws(() => {
+        throw new Error('error')
+    },
+    err => {
+        t.true(err instanceof Error);
+        t.equal(err.message, 'error');
+    });
+});
+
+suite.test('t.throws() - with callback', t => {
+    t.throws(done => {
+        done();
+    });
+});
+
+suite.test('t.throws() - with callback error', t => {
+    t.throws(() => {
+        t.throws(done => {
+            done(new Error('error'));
+        });
+    });
+});
+
+suite.test('t.notThrows() synchronous', t => {
+    t.notThrows(() => {
+        //no error
+    });
+});
+
+suite.test('t.notThrows() asynchronous', t => {
+    t.notThrows(() => {
+        return Promise.delay(100).return(Promise.resolve(true));
+    });
+});
+
+suite.test('t.notThrows() nested', t => {
+    t.notThrows(() => {
+        //no error
+    });
+    t.throws(() => {
+        t.notThrows(() => {
+            throw new Error('error');
+        });
+    });
+});
+
+suite.test('t.noError()', t => {
+
+    function callbackWithError(cb) {
+        cb(new Error());
+    }
+
+    function callbackWithoutError(cb) {
+        cb(undefined);
+    }
+
+    callbackWithoutError(t.noError);
+    t.throws(() => {
+        callbackWithError(t.noError);
+    });
+});
+
+suite.test('t.count() - Count Pass', t => {
+    t.count(done => {
+        done();
+        done();
+    }, 2);
+});
+
+suite.test('t.count() - Count Fail', t => {
+    t.count(done => {
+        done();
+        done();
+        done();
+    }, 2);
+
+    t.failure(() => {
+        t.assert(true);
+    })
+});
