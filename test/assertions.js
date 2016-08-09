@@ -15,12 +15,6 @@ suite.test('t.is()', t => {
     });
 });
 
-suite.test('fail()', t => {
-    t.throws(() => {
-        t.fail('something bad happened');
-    });
-});
-
 suite.test('t.not()', t => {
     t.not(1, 5);
     t.throws(() => {
@@ -54,6 +48,26 @@ suite.test('t.falsey()', t => {
     t.throws(() => {
         t.falsey(1);
     });
+});
+
+suite.test('t.assert()', t => {
+    t.assert(1);
+});
+
+suite.test('t.equal()', t => {
+    t.equal(1, 1);
+});
+
+suite.test('t.equals()', t => {
+    t.equals(2, 2);
+});
+
+suite.test('t.notEqual()', t => {
+    t.notEqual(1, 2);
+});
+
+suite.test('t.notEquals()', t => {
+    t.notEquals(1, 2);
 });
 
 suite.test('t.deepEqual()', t => {
