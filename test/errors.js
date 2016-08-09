@@ -14,6 +14,6 @@ suite.test('error message', t => {
     t.equal(1, 2, 'not equal!');
 });
 
-suite.test('error message', t => {
+suite.test('no error message', t => {
     t.equal(1, 2);
 });

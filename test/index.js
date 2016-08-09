@@ -4,7 +4,11 @@ Promise.config({
     warnings: true,
     longStackTraces: true
 });
-require('./general');
+require('./assertions');
+require('./errors');
+require('./fail-fast');
+require('./fail-fast-serial');
+require('./todo-skip');
 require('./hooks');
 require('./only');
 require('./serial');

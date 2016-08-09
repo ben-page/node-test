@@ -6,21 +6,13 @@ Promise.config({
 });
 const Suite = require('../lib/suite');
 
-const suite = new Suite('General Testing');
+const suite = new Suite('Assertions Testing');
 
 suite.test('t.is()', t => {
     t.is(1, 1);
     t.throws(() => {
         t.is(1, 5);
     });
-});
-
-suite.todo('something todo', t => {
-    t.fail('should not run');
-});
-
-suite.skip('skipped', t => {
-    t.fail('should not run');
 });
 
 suite.test('fail()', t => {
