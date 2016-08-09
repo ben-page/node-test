@@ -15,7 +15,6 @@ suite.test('no time out', t => {
     });
 });
 
-//this is not a great way to test this. it's not really testing for the timeout, just a failure.
 suite.test('timed out', t => {
     t.notThrows(() => {
         return Promise.delay(1200);

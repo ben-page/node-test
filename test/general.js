@@ -15,12 +15,12 @@ suite.test('t.is()', t => {
     });
 });
 
-suite.todo('something todo', () => {
-    assert(false);
+suite.todo('something todo', t => {
+    t.fail('should not run');
 });
 
-suite.skip('skipped', () => {
-    assert(false);
+suite.skip('skipped', t => {
+    t.fail('should not run');
 });
 
 suite.test('fail()', t => {
