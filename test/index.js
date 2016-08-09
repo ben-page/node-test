@@ -11,6 +11,7 @@ require('./fail-fast-serial');
 require('./todo-skip');
 require('./hooks');
 require('./only');
+require('./reporter');
 require('./serial');
 require('./suite-hooks');
 require('./time-out');

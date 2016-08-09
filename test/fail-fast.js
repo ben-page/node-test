@@ -13,7 +13,7 @@ suite.test('pass', t => {
 });
 
 suite.test('fail', t => {
-    t.equal(1, 2);
+    t.fail();
 });
 
 suite.test('stop', t => {
