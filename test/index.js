@@ -7,7 +7,6 @@ Promise.config({
 require('./assertions');
 require('./errors');
 require('./fail-fast');
-require('./fail-fast-serial');
 require('./todo-skip');
 require('./hooks');
 require('./only');
