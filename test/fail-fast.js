@@ -22,3 +22,9 @@ suite.test('stop', t => {
             t.equal(1, 1);
         });
 });
+
+suite.after(t => {
+    t.equals(suite._test[0]._report.status, 'pass');
+    t.equals(suite._test[1]._report.status, 'fail');
+    t.equals(suite._test[2]._report.status, 'stop');
+});

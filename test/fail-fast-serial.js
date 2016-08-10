@@ -13,7 +13,7 @@ suite.serial.test('pass', t => {
 });
 
 suite.serial.test('fail', t => {
-    t.equal(1, 2);
+    t.fail();
 });
 
 suite.serial.test('stop', t => {
