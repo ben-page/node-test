@@ -19,8 +19,7 @@ suite.test('timed out', t => {
     t.notThrows(() => {
         return Promise.delay(1200);
     });
-
-    t.failure(err => {
-        t.true(err instanceof Promise.TimeoutError);
-    });
+},
+(err, t) => {
+    t.true(err instanceof Promise.TimeoutError);
 });

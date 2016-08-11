@@ -166,10 +166,9 @@ suite.test('t.throws() failures', t => {
     t.throws(() => {
         return Promise.delay(100).return(Promise.resolve(true));
     });
-
-    t.failure(() => {
-        t.pass();
-    });
+},
+(err, t) => {
+    t.equal(err.message, 'Expected Error but none was thrown');
 });
 
 suite.test('t.throws() nested', t => {
@@ -211,13 +210,12 @@ suite.test('t.notThrows() synchronous', t => {
 });
 
 suite.test('t.notThrows() failure', t => {
-    t.failure(err => {
-        t.equals(err.message, '1 === 2');
-    });
-
     t.notThrows(() => {
         t.equals(1, 2);
     });
+},
+(err, t) => {
+    t.equals(err.message, '1 === 2');
 });
 
 suite.test('t.notThrows() asynchronous', t => {
@@ -258,10 +256,10 @@ suite.test('t.throws(fn, \'message\')', t => {
         t.fail()
     },
     'expected to throw');
-
-    t.failure(err => {
-        t.equals(err.message, 'expected to throw');
-    })
+    
+},
+(err, t) => {
+    t.equals(err.message, 'expected to throw');
 });
 
 suite.test('t.throws(Promise.resolve())', t => {
@@ -269,10 +267,9 @@ suite.test('t.throws(Promise.resolve())', t => {
         return Promise.resolve();
     },
     'expected to throw');
-
-    t.failure(err => {
-        t.equals(err.message, 'expected to throw');
-    })
+},
+(err, t) => {
+    t.equals(err.message, 'expected to throw');
 });
 
 suite.test('t.throws(Promise.reject())', t => {
@@ -291,10 +288,9 @@ suite.test('t.throws() throw in test error func', t => {
     err => {
         t.equals(err.message, 'threw 2');
     });
-
-    t.failure(err => {
-        t.equals(err.message, '\'threw\' === \'threw 2\'');
-    })
+},
+(err, t) => {
+    t.equals(err.message, '\'threw\' === \'threw 2\'');
 });
 
 suite.test('t.throws() promise in test error func', t => {
@@ -304,10 +300,9 @@ suite.test('t.throws() promise in test error func', t => {
     err => {
         return Promise.reject(new Error('threw 2'));
     });
-
-    t.failure(err => {
-        t.equals(err.message, 'threw 2');
-    })
+},
+(err, t) => {
+    t.equals(err.message, 'threw 2');
 });
 
 suite.test('t.throws() is sync, but test error func is async', t => {
@@ -317,8 +312,7 @@ suite.test('t.throws() is sync, but test error func is async', t => {
     err => {
         return Promise.reject(new Error('threw 2'));
     });
-
-    t.failure(err => {
-        t.equals(err.message, 'threw 2');
-    })
+},
+(err, t) => {
+    t.equals(err.message, 'threw 2');
 });
