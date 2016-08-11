@@ -21,6 +21,6 @@ suite.test('timed out', t => {
     });
 
     t.failure(err => {
-        t.assert(err.message, 'Timed Out');
-    })
+        t.true(err instanceof Promise.TimeoutError);
+    });
 });

@@ -214,7 +214,7 @@ suite.test('t.notThrows() failure', t => {
     t.failure(err => {
         t.equals(err.message, '1 === 2');
     });
-    
+
     t.notThrows(() => {
         t.equals(1, 2);
     });
@@ -251,49 +251,6 @@ suite.test('t.noError()', t => {
     t.throws(() => {
         callbackWithError(t.noError);
     });
-});
-
-suite.test('t.count() - Count Pass', t => {
-    t.count(done => {
-        done();
-        done();
-    }, 2);
-});
-
-suite.test('t.count() - Count Fail', t => {
-    t.count(done => {
-        done();
-        done();
-        done();
-    }, 2);
-
-    t.failure(err => {
-        t.equals(err.message, '3 === 2');
-    })
-});
-
-suite.test('t.count() - call callback late', t => {
-    t.count(done => {
-        done();
-        done();
-        setTimeout(() => {
-            done();
-        }, 100);
-    }, 2);
-    
-    process.once('uncaughtException', err => {
-        t.equals(err.message, 'callback executed after test completed');
-    });
-});
-
-suite.test('t.count() - synchronous error', t => {
-    t.count(done => {
-        throw new Error('sync')
-    }, 2);
-
-    t.failure(err => {
-        t.equals(err.message, 'sync');
-    })
 });
 
 suite.test('t.throws(fn, \'message\')', t => {
@@ -334,7 +291,7 @@ suite.test('t.throws() throw in test error func', t => {
     err => {
         t.equals(err.message, 'threw 2');
     });
-    
+
     t.failure(err => {
         t.equals(err.message, '\'threw\' === \'threw 2\'');
     })
@@ -347,7 +304,7 @@ suite.test('t.throws() promise in test error func', t => {
     err => {
         return Promise.reject(new Error('threw 2'));
     });
-    
+
     t.failure(err => {
         t.equals(err.message, 'threw 2');
     })
@@ -360,7 +317,7 @@ suite.test('t.throws() is sync, but test error func is async', t => {
     err => {
         return Promise.reject(new Error('threw 2'));
     });
-    
+
     t.failure(err => {
         t.equals(err.message, 'threw 2');
     })
