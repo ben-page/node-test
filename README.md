@@ -489,13 +489,13 @@ function Reporter(emitter) {
 }
 ```
 
-### Event `start`
+### Event: `start`
 Emitted before tests start running.
 #### `root => { }`
 - `root`: object
     - `suites`: array - suites that will be run (see `suiteEnd` for suite structure)
 
-### Event `testEnd`
+### Event: `testEnd`
 Emitted after a test has completed.
 #### `test => { }`
 - `test`: object
@@ -504,7 +504,7 @@ Emitted after a test has completed.
     - `status`: string - `pass`, `fail`, `todo`, `skip`, or `stop`
     - `runTime`: number - run time of test in milliseconds
 
-### Event `suiteEnd`
+### Event: `suiteEnd`
 Emitted after a suite has completed.
 #### `suite => { }`
 - `suite`: object
@@ -512,7 +512,7 @@ Emitted after a suite has completed.
     - `err`: Error|undefined - suite level errors, such as beforeAll and afterAll hook errors
     - `tests`: array - all tests in the suite (see `testEnd` for test structure)
 
-### Event `end`
+### Event: `end`
 Emitted when all suites are completed.
 
 ## Todo

@@ -15,7 +15,7 @@ let start = 0,
     end = 0,
     expectedTestEnd = 0;
 
-const expectedSuiteEnd = 9;
+const expectedSuiteEnd = 10;
 
 const tests = [];
 
