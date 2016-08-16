@@ -14,6 +14,7 @@
     * [Hooks](#hooks)
     * [Assertions](#t-built-in-assertion-library)
 * [Running Multiple Suites](#running-multiple-suites)
+* [Custom Reporters](#custom-reports)
 * [Todo](#todo)
 
 ## Core Philosophy
@@ -467,15 +468,59 @@ There are couple ways to run multiple suites.
     ```
 3. The up coming CLI will make it easier to execute multiple suites without needing to maintain an `index.js`.
 
+## Custom Reporters
+A reporter is a simple constructor function that takes an event emitter as it's only argument. The emitter emit four different events.
+```javascript
+function Reporter(emitter) {
+    emitter.on('start', root => {
+        console.log('testing started');
+    });
+    
+    emitter.on('testEnd', test => {
+        
+    });
+    
+    emitter.on('suiteEnd', suite => {
+        
+    });
+    
+    emitter.on('end', () => {
+    });
+}
+```
+
+### Event `start`
+Emitted before tests start running.
+#### `root => { }`
+- `root`: object
+    - `suites`: array - suites that will be run (see `suiteEnd` for suite structure)
+
+### Event `testEnd`
+Emitted after a test has completed.
+#### `test => { }`
+- `test`: object
+    - `name`: string - name of test
+    - `suite`: object - suite the test belongs to
+    - `status`: string - `pass`, `fail`, `todo`, `skip`, or `stop`
+    - `runTime`: number - run time of test in milliseconds
+
+### Event `suiteEnd`
+Emitted after a suite has completed.
+#### `suite => { }`
+- `suite`: object
+    - `name`: string - name of test
+    - `err`: Error|undefined - suite level errors, such as beforeAll and afterAll hook errors
+    - `tests`: array - all tests in the suite (see `testEnd` for test structure)
+
+### Event `end`
+Emitted when all suites are completed.
+
 ## Todo
 
 * CLI 
     * file watcher
     * only run certain files (glob matching)
-    * run suites in individual contexts
     * harmony flag
-* js-report support
-* test Error output
 
 ## Considering
 * code coverage
