@@ -14,7 +14,7 @@
     * [Hooks](#hooks)
     * [Assertions](#t-built-in-assertion-library)
 * [Running Multiple Suites](#running-multiple-suites)
-* [Custom Reporters](#custom-reports)
+* [Custom Reporters](#custom-reporters)
 * [Todo](#todo)
 
 ## Core Philosophy
