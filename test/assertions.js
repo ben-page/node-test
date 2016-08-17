@@ -257,7 +257,6 @@ suite.test('t.throws(fn, \'message\')', t => {
         t.fail()
     },
     'expected to throw');
-    
 },
 (err, t) => {
     t.equals(err.message, 'expected to throw');

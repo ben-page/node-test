@@ -124,12 +124,14 @@ The following methods are used to create concurrent tests.
   - `t`: object (built-in assertions)
   - (optional) `state`: object - result of `beforeEach` hook
   - (optional) `done`: function - callback for asynchronous tests
+  - `validateError`: function - function to validate the error
 
 ###### Test Resolution
 - Any `Error` throw synchronously will cause the test to fail.
 - Asynchronous test can return a Promise or use the `done()` callback.
   - If the test returns a Promise, the test will pass or fail if the promise resolves or rejects, respectively.
   - If the `done()` callback is used, the test will fail if the first argument is defined. See [Node.js style callbacks](https://nodejs.org/api/errors.html#errors_node_js_style_callbacks).
+- `validateError` can turn a failing test into a passing test, if the error validates. (see below)  
 
 ###### Synchronous Test:
 ```javascript
@@ -158,6 +160,29 @@ suite.test('My Test', (t, state, done) => {
 
 suite.test('My Test 2', (t, state, done) => {
     funcWithCallbackNoValue(done);
+});
+```
+
+##### Error Validation
+`validateError` tests that a specific error was throw. This is makes it easy to test to test error conditions. The test will pass, if `validateError` is passed and does not throw.
+
+###### Passing Test
+```javascript
+t.throws(() => {
+  return Promise.reject(new Error('expected error'));
+},
+err => {
+  t.true(err instanceof Error);
+  t.equal(err.message, 'expected error');
+});
+```
+###### Failing Test
+```javascript
+t.throws(() => {
+  return Promise.reject(new Error('expected error'));
+},
+err => {
+  t.equal(err.message, 'other error');
 });
 ```
 
@@ -408,9 +433,9 @@ An assertion that `fn` is function that either throws an Error synchronously or 
 ###### Arguments
 - `fn`: function([done]) - code to assert throws
   - (optional) `done`: function - callback for asynchronous test
-- `errTestFn`: function() - code to test the error
+  - `validateError`: function - function to validate the error
 
-Except for the `errTestFn` argument, this functions as the opposite of `t.notThrow()`. That is `throws` passes when there is an Error rather passing when there is no Error. For more usage details, look at the `notThrows` examples.
+Except for the `validateError` argument, this functions as the opposite of `t.notThrow()`. That is `throws` passes when there is an Error rather passing when there is no Error. For more usage details, look at the `notThrows` examples.
 
 Passing `errTestFn` allows testing that the Error received is the Error expected.
 ```javascript
