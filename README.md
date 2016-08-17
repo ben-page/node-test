@@ -15,14 +15,15 @@
     * [Assertions](#t-built-in-assertion-library)
 * [Running Multiple Suites](#running-multiple-suites)
 * [Custom Reporters](#custom-reporters)
+* [Multiple Library Instances](#multiple-library-instances)
 * [Todo](#todo)
 
-## Core Philosophy
+## Design
 
-* Fast - Concurrent Tests
+* Runs Tests Concurrently
 * No global variables
-* Optional CLI  - Running a test file directly (`node test/test-something.js`) produces the same output as using the CLI.
-* Minimal - Just runs your tests and gives you the results. There's no fancy error interpretation, just a plain old Node.js error callstack.
+* CLI is optional - Running a test file directly (`node test/test-something.js`) produces the same output as using the CLI.
+* There's no fancy error interpretation, just a plain old Node.js error stack trace.
 * No planning tests or counting assertions.
 * Asynchronous Tests - Prefers Promises, but supports Callbacks
 * Built-In assertion library build on the core `assert` module
@@ -461,6 +462,7 @@ t.count(done1 => {
 
 ## Running Multiple Suites
 There are couple ways to run multiple suites.
+
 1. The easiest (and least flexible) way to just place multiple suites in a single file.
 2. A more flexible way is to create one suite per file and create an index file to run them all.
 
@@ -496,6 +498,8 @@ There are couple ways to run multiple suites.
 ## Custom Reporters
 A reporter is a simple constructor function that takes an event emitter as it's only argument. The emitter emit four different events.
 ```javascript
+const Suite = require('node-test');
+
 function Reporter(emitter) {
     emitter.on('start', root => {
         console.log('testing started');
@@ -512,7 +516,12 @@ function Reporter(emitter) {
     emitter.on('end', () => {
     });
 }
+
+Suite.addReporter(Reporter);
 ```
+
+### `Suite.addReporter(Reporter)`
+Add a reporter to the runner for all suites. If no reporter is added, the default reporter will be used.
 
 ### Event: `start`
 Emitted before tests start running.
@@ -540,6 +549,13 @@ Emitted after a suite has completed.
 ### Event: `end`
 Emitted when all suites are completed.
 
+## Multiple Library Instances
+It's possibly to get separate instances of the library. The primarily useful because each suite has it's own reporters.
+### `Suite.getNewLibraryCopy()` 
+```javascript
+const Suite = require('node-test');
+const NewSuite = Suite.getNewLibraryCopy();
+```
 ## Todo
 
 * CLI 
