@@ -7,6 +7,7 @@ Promise.config({
 const Suite = require('../lib/suite');
 
 const suite = new Suite('Assertions Testing');
+suite.setTimeout(1000);
 
 suite.test('t.is()', t => {
     t.is(1, 1);
@@ -315,4 +316,32 @@ suite.test('t.throws() is sync, but test error func is async', t => {
 },
 (err, t) => {
     t.equals(err.message, 'threw 2');
+});
+
+suite.test('t.count()', t => {
+    t.count(done => {
+        done();
+        done();
+    }, 2)
+});
+
+suite.test('t.count() - called too many times', t => {
+    t.count(done => {
+        done();
+        done();
+        done();
+    }, 2)
+},
+(err, t) => {
+    t.equal(err.message, 'count exceeded');
+});
+
+suite.test('t.count() - called too few times', t => {
+    t.count(done => {
+        done();
+        done();
+    }, 3)
+},
+(err, t) => {
+    t.true(err instanceof Promise.TimeoutError);
 });
