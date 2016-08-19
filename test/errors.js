@@ -271,46 +271,46 @@ suite.test('validation notThrows()', t => {
     });
 });
 
-// suite.test('validation count()', t => {
-//     t.throws(() => {
-//         t.count();
-//     },
-//     err => {
-//         t.equal(err.message, 'argument 1 \'fn\' should be a function');
-//     });
-//
-//     t.throws(() => {
-//         t.count((a,b) => {});
-//     },
-//     err => {
-//         t.equal(err.message, 'argument 1 \'fn\' should be a function with 1 argument');
-//     });
-//
-//     t.throws(() => {
-//         t.count((a) => {});
-//     },
-//     err => {
-//         t.equal(err.message, 'argument 2 \'count\' should be a whole number greater than 0');
-//     });
-//
-//     t.throws(() => {
-//         t.count((a) => {}, 0);
-//     },
-//     err => {
-//         t.equal(err.message, 'argument 2 \'count\' should be a whole number greater than 0');
-//     });
-//
-//     t.throws(() => {
-//         t.count((a) => {}, 5.5);
-//     },
-//     err => {
-//         t.equal(err.message, 'argument 2 \'count\' should be a whole number greater than 0');
-//     });
-//
-//     t.throws(() => {
-//         t.count((a) => {}, 5, 1);
-//     },
-//     err => {
-//         t.equal(err.message, 'argument 3 \'message\' should be a string');
-//     });
-// });
+suite.test('validation count()', t => {
+    t.throws(() => {
+        t.count();
+    },
+    err => {
+        t.equal(err.message, 'argument 1 \'fn\' should be a function');
+    });
+
+    t.throws(() => {
+        t.count((a,b) => {});
+    },
+    err => {
+        t.equal(err.message, 'argument 1 \'fn\' should be a function with 1 argument');
+    });
+
+    t.throws(() => {
+        t.count((a) => {});
+    },
+    err => {
+        t.equal(err.message, 'argument 2 \'count\' should be a whole number greater than 0');
+    });
+
+    t.throws(() => {
+        t.count((a) => {}, 0);
+    },
+    err => {
+        t.equal(err.message, 'argument 2 \'count\' should be a whole number greater than 0');
+    });
+
+    t.throws(() => {
+        t.count((a) => {}, 5.5);
+    },
+    err => {
+        t.equal(err.message, 'argument 2 \'count\' should be a whole number greater than 0');
+    });
+
+    t.throws(() => {
+        t.count((a) => {}, 5, 1);
+    },
+    err => {
+        t.equal(err.message, 'argument 3 \'message\' should be a string');
+    });
+});

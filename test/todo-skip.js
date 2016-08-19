@@ -23,4 +23,8 @@ new Suite('General Testing')
     
     .test('pass 1', t => {
         t.notEquals(1, 2);
+    })
+    
+    .test('fail', t => {
+        t.equals(1, 2);
     });
