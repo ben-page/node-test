@@ -10,18 +10,20 @@ Suite.addReporter(Reporter);
 Suite.addReporter(SpyReporter);
 
 let start = 0,
-    testEnd = 0,
-    suiteEnd = 0,
     end = 0,
-    expectedTestEnd = 0;
-
-const expectedSuiteEnd = 10;
+    testEnd = 0,
+    expectedTests = 0,
+    suiteEnd = 0,
+    expectedSuites = 0;
 
 const tests = [];
 
 function SpyReporter(runner) {
     runner.on('start', root => {
-        start++;
+        if (++start !== 1)
+            throw new Error(`expected start event 1 times, but got it ${start} times`);
+    
+        expectedSuites = root.suites.length;
     });
     
     runner.on('testEnd', test => {
@@ -33,20 +35,17 @@ function SpyReporter(runner) {
     
     runner.on('suiteEnd', suite => {
         suiteEnd++;
-        expectedTestEnd += suite.tests.length;
+        expectedTests += suite.tests.length;
     });
     
     runner.on('end', () => {
         if (++end > 1)
             throw new Error(`expected end event 1 times, but got it ${end} times`);
     
-        if (start !== 1)
-            throw new Error(`expected start event 1 times, but got it ${start} times`);
+        if (suiteEnd !== expectedSuites)
+            throw new Error(`expected suiteEnd event ${expectedSuites} times, but got it ${suiteEnd} times`);
     
-        if (suiteEnd !== expectedSuiteEnd)
-            throw new Error(`expected suiteEnd event ${expectedSuiteEnd} times, but got it ${suiteEnd} times`);
-    
-        if (testEnd !== expectedTestEnd)
-            throw new Error(`expected testEnd event ${expectedTestEnd} times, but got it ${testEnd} times`);
+        if (testEnd !== expectedTests)
+            throw new Error(`expected testEnd event ${expectedTests} times, but got it ${testEnd} times`);
     });
 }

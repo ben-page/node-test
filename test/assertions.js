@@ -7,7 +7,7 @@ Promise.config({
 const Suite = require('../lib/suite');
 
 const suite = new Suite('Assertions Testing');
-suite.setTimeout(1000);
+suite.config({timeout: 1000});
 
 suite.test('t.is()', t => {
     t.is(1, 1);

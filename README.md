@@ -105,8 +105,6 @@ The first thing you do with `node-test` is create a suite for your tests.
 ##### `new Suite(name, [options])`- suite constructor
 ###### Arguments
 - `name`: string - title for test
-- `options`: object 
-  - `failFast`: boolean (default: false) - if a single test fails, stop all remaining tests in the suite
 
 ```javascript
 const Suite = require('node-test');
@@ -274,8 +272,18 @@ Same as `suite.before()`.
 
 #### Other Members
 
-##### `suite.setTimeout(delay)` - Set the time limit for tests (default: 5000)
-Tests whose execution time exceeds the delay will fail.
+##### `suite.config(options)` - Set the time limit for tests (default: 5000)
+- `options`: object 
+  - `failFast`: boolean (default: false) - If a single test fails, stop all remaining tests in the suite.
+  - `timeout`: number (default: 5000) - A time out for tests. If test's execution time exceeds the value, the test will fail.
+
+```javascript
+suite.config({
+    failFast: false,
+    timeout: 10000
+});
+```
+
 ###### Arguments
 - `delay`: number - timeout in milliseconds
 

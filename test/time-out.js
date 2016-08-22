@@ -7,7 +7,7 @@ Promise.config({
 const Suite = require('../lib/suite');
 
 const suite = new Suite('timeout tests');
-suite.setTimeout(1000);
+suite.config({ timeout: 1000 });
 
 suite.test('no time out', t => {
     t.notThrows(() => {

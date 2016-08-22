@@ -21,7 +21,8 @@ suite.test('concurrent', (t, state, done) => {
     }
     CopyOfSuite.addReporter(SpyReporter);
     
-    const innerSuite = new CopyOfSuite('fail fast', { failFast: true });
+    const innerSuite = new CopyOfSuite('fail fast');
+    innerSuite.config({failFast: true});
     
     innerSuite.test('pass', t2 => {
         t2.equal(1, 1);
@@ -52,7 +53,8 @@ suite.test('serial', (t, state, done) => {
     }
     CopyOfSuite.addReporter(SpyReporter);
 
-    const innerSuite = new CopyOfSuite('fail fast', { failFast: true });
+    const innerSuite = new CopyOfSuite('fail fast');
+    innerSuite.config({failFast: true});
 
     innerSuite.serial.test('pass', t2 => {
         t2.equal(1, 1);

@@ -6,7 +6,7 @@ Promise.config({
 });
 const Suite = require('../lib/suite');
 
-new Suite('General Testing')
+new Suite('Todo, Skip')
     .test('t.is()', t => {
         t.pass();
     })
@@ -15,7 +15,7 @@ new Suite('General Testing')
         t.fail('should not run');
     })
     
-    .todo('something todo')
+    .todo('something todo 2')
 
     .skip('skipped', t => {
         t.fail('should not run');
@@ -23,8 +23,8 @@ new Suite('General Testing')
     
     .test('pass 1', t => {
         t.notEquals(1, 2);
-    })
-    
-    .test('fail', t => {
-        t.equals(1, 2);
     });
+    
+    // .test('fail', t => {
+    //     t.equals(1, 2);
+    // });
