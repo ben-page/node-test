@@ -329,7 +329,6 @@ suite.test('t.async() w/ error', (t, state, done) => {
         t.fail();
         done();
     }), 100);
-    console.log()
 },
 (err, t) => {
     t.equals(err.message, 'failed');
