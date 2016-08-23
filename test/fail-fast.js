@@ -12,12 +12,12 @@ suite.test('concurrent', (t, state, done) => {
     const CopyOfSuite = Suite.getNewLibraryCopy();
     
     function SpyReporter(runner) {
-        runner.on('suiteEnd', suite2 => {
+        runner.on('suiteEnd', t.async(suite2 => {
             t.equals(suite2.tests[0].status, 'pass');
             t.equals(suite2.tests[1].status, 'fail');
             t.equals(suite2.tests[2].status, 'stop');
             done();
-        });
+        }));
     }
     CopyOfSuite.addReporter(SpyReporter);
     
@@ -44,12 +44,12 @@ suite.test('serial', (t, state, done) => {
     const CopyOfSuite = Suite.getNewLibraryCopy();
 
     function SpyReporter(runner) {
-        runner.on('suiteEnd', suite2 => {
+        runner.on('suiteEnd', t.async(suite2 => {
             t.equals(suite2.tests[0].status, 'pass');
             t.equals(suite2.tests[1].status, 'fail');
             t.equals(suite2.tests[2].status, 'stop');
             done();
-        });
+        }));
     }
     CopyOfSuite.addReporter(SpyReporter);
 

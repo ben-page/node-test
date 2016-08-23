@@ -317,29 +317,57 @@ suite.test('t.throws() is sync, but test error func is async', t => {
     t.equals(err.message, 'threw 2');
 });
 
-suite.test('t.count()', t => {
-    t.count(done => {
+suite.test('t.async()', (t, state, done) => {
+    setTimeout(t.async(() => {
+        t.pass();
         done();
-        done();
-    }, 2)
+    }), 100);
 });
 
-suite.test('t.count() - called too many times', t => {
-    t.count(done => {
+suite.test('t.async() w/ error', (t, state, done) => {
+    setTimeout(t.async(() => {
+        t.fail();
         done();
+    }), 100);
+    console.log()
+},
+(err, t) => {
+    t.equals(err.message, 'failed');
+});
+
+suite.test('t.async() w/ node style callback', (t, state, done) => {
+    
+    function funcWithAsyncCallback(cb) {
+        setTimeout(() => cb(undefined, 1), 100);
+    }
+    
+    funcWithAsyncCallback(t.async((err, result) => {
+        t.noError(err);
+        t.equals(1, result);
         done();
-        done();
-    }, 2)
+    }));
+});
+
+suite.test('t.async()', t => {
+    const count = t.async(2);
+    count();
+    count();
+});
+
+suite.test('t.async() - called too many times', t => {
+    const count = t.async(2);
+    count();
+    count();
+    count();
 },
 (err, t) => {
     t.equal(err.message, 'count exceeded');
 });
 
-suite.test('t.count() - called too few times', t => {
-    t.count(done => {
-        done();
-        done();
-    }, 3)
+suite.test('t.async() - called too few times', t => {
+    const count = t.async(3);
+    count();
+    count();
 },
 (err, t) => {
     t.true(err instanceof Promise.TimeoutError);

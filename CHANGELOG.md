@@ -1,3 +1,7 @@
+### 1.2
+- removed suite.setTimeout() added suite.config()
+- changed t.count() back to t.async()
+
 ### 1.1.1
 - fixed missing t.throws argument in documentation
 

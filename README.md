@@ -415,16 +415,10 @@ t.notThrows(done1 => {
 t.notThrows(done1 => {
     funcWithSyncCallback(done1);
 });
-t.notThrows(done1 => {
-    funcWithCallback((err, result) => {
-        t.noError(err);
-        t.equal(result, 2);
-        done1();
-    });
-});
 ```
-Even if an asynchronous mode is used, synchronous errors are caught.
+
 ###### Mixed Synchronous & Asynchronous
+Even if an asynchronous mode is used, synchronous errors are caught.
 Would Fail:
 ```javascript
 t.notThrows(done => {
@@ -457,15 +451,31 @@ err => {
 });
 ```
 
-#### `t.count(fn, count, [message])`
-An asynchronous assertion that `fn` eventually executes a callback a precise number of times.
-
+### `t.async([fn], [count])`
+An assertion that wraps any asynchronous functions so the test awaits the function being called and ensures asynchronous errors are caught.
+###### Arguments
+- `fn`: function - counting function
+- `count`: number - number of times to expect to be called
+ 
+A common use of this function is waiting on asynchronous callbacks.
 ```javascript
-t.count(done1 => {
-    funcWithCallback(done1);
-    funcWithCallback(done1);
-    funcWithCallback(done1);
-}, 3);
+funcWithAsyncCallback(t.async((err, result) => {
+    t.noError(err);
+    t.equals(1, result);
+}));
+
+setTimeout(t.async(() => {
+    t.pass();
+}), 200);
+```
+
+If `count` is passed, the function is expected to be called more than once.
+```javascript
+const count = t.count((err, result) => {
+    t.noError(err);
+}, 2);
+funcWithAsyncCallback(count);
+funcWithAsyncCallback(count);
 ```
 
 ## Running Multiple Suites

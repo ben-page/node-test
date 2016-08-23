@@ -271,46 +271,41 @@ suite.test('validation notThrows()', t => {
     });
 });
 
-suite.test('validation count()', t => {
+suite.test('validation async()', t => {
     t.throws(() => {
-        t.count();
+        t.async(1, 2, 3);
     },
     err => {
-        t.equal(err.message, 'argument 1 \'fn\' should be a function');
+        t.equal(err.message, 'expected between 0 and 2 arguments');
     });
-
+    
     t.throws(() => {
-        t.count((a,b) => {});
+        t.async('test');
     },
     err => {
-        t.equal(err.message, 'argument 1 \'fn\' should be a function with 1 argument');
+        t.equal(err.message, 'argument 1 should be a function or number');
     });
-
+    
     t.throws(() => {
-        t.count((a) => {});
+        t.async((a) => {
+        }, 0);
     },
     err => {
         t.equal(err.message, 'argument 2 \'count\' should be a whole number greater than 0');
     });
-
+    
     t.throws(() => {
-        t.count((a) => {}, 0);
+        t.async(1, 1);
+    },
+    err => {
+        t.equal(err.message, 'unexpected argument 2');
+    });
+    
+    t.throws(() => {
+        t.async((a) => {
+        }, 5.5);
     },
     err => {
         t.equal(err.message, 'argument 2 \'count\' should be a whole number greater than 0');
-    });
-
-    t.throws(() => {
-        t.count((a) => {}, 5.5);
-    },
-    err => {
-        t.equal(err.message, 'argument 2 \'count\' should be a whole number greater than 0');
-    });
-
-    t.throws(() => {
-        t.count((a) => {}, 5, 1);
-    },
-    err => {
-        t.equal(err.message, 'argument 3 \'message\' should be a string');
     });
 });
