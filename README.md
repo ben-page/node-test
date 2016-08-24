@@ -23,7 +23,7 @@
 * Runs Tests Concurrently (In Parallel)
 * No global variables (no `describe()`, `it()`, etc).
 * No CLI required - Running a test file directly (`node test/test-something.js`) produces the same output as using the CLI.
-* There's no fancy error interpretation, just a plain old Node.js error stack trace.
+* Long/Async Stack Traces
 * Debuggable - Does not fork tests by default.
 * No planning tests or counting assertions required.
 * Easily Build Asynchronous Tests - via Promises or Callbacks
