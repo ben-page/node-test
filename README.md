@@ -148,7 +148,7 @@ suite.test('My Test', t => {
 ###### Tests with a Synchronous Callback
 ```js
 suite.test('My Test', (t, done) => {
-    funcWithCallback(err, result) => {
+    funcWithCallback((err, result) => {
         t.noError(err);
         t.equal(result, 2);
         done();
@@ -177,9 +177,10 @@ suite.test('My Test 2', (t, done) => {
 ```
 
 ##### Error Validation
-`validateError` tests that a specific error was throw. This is makes it easy to test to test error conditions. The test will pass, if `validateError` is passed and does not throw.
+`validateError` tests that a specific error was throw. This is makes it easy to test error conditions. The test will pass, if `validateError` is passed to the test and does not throw.
 
 ###### Passing Test
+In this example the main test fails, but `validateError` passes. So the whole test is considered to have pass.
 ```js
 t.throws(() => {
   return Promise.reject(new Error('expected error'));
@@ -189,7 +190,9 @@ err => {
   t.equal(err.message, 'expected error');
 });
 ```
+
 ###### Failing Test
+In this example the main test fails and `validateError` fails too. The error is not what `validateError` expected, so the test fails.
 ```js
 t.throws(() => {
   return Promise.reject(new Error('expected error'));
@@ -272,6 +275,8 @@ The `beforeEach` hook runs before each test in the suite.
 ###### Usage with `suite.beforeEach()`
 The beforeEach hook is execute for every individual test, so each test has it's own state. Notice how `state.data` is 2 for both tests, even though the tests modify it.
 
+If `beforeHook` is called, `state` is inserted as the second argument of the test `action` between `t` and `done`.
+
 ```js
 suite.beforeEach(t => {
     return {
@@ -287,6 +292,10 @@ suite.test('My Test 1', (t, state) => {
 suite.test('My Test 2', (t, state, done) => {
     t.equal(2, state.data);
     done();
+});
+
+suite.afterEach((t, state) => {
+    state.data = 0;
 });
 ```
 #### `suite.afterEach(action)` - Run after each individual tests in the suite.

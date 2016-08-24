@@ -1,9 +1,4 @@
 'use strict';
-const Promise = require('bluebird');
-Promise.config({
-    warnings: true,
-    longStackTraces: true
-});
 const Suite = require('../lib/suite');
 
 new Suite('Todo, Skip')

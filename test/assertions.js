@@ -1,9 +1,5 @@
 'use strict';
 const Promise = require('bluebird');
-Promise.config({
-    warnings: true,
-    longStackTraces: true
-});
 const Suite = require('../lib/suite');
 
 const suite = new Suite('Assertions Testing');
@@ -145,7 +141,7 @@ suite.test('t.lessThanOrEqual()', t => {
     });
 });
 
-suite.test('done()', (t, state, done) => {
+suite.test('done()', (t, done) => {
     setTimeout(() => {
         done();
     }, 200);
@@ -317,14 +313,14 @@ suite.test('t.throws() is sync, but test error func is async', t => {
     t.equals(err.message, 'threw 2');
 });
 
-suite.test('t.async()', (t, state, done) => {
+suite.test('t.async()', (t, done) => {
     setTimeout(t.async(() => {
         t.pass();
         done();
     }), 100);
 });
 
-suite.test('t.async() w/ error', (t, state, done) => {
+suite.test('t.async() w/ error', (t, done) => {
     setTimeout(t.async(() => {
         t.fail();
         done();
@@ -334,7 +330,7 @@ suite.test('t.async() w/ error', (t, state, done) => {
     t.equals(err.message, 'failed');
 });
 
-suite.test('t.async() w/ node style callback', (t, state, done) => {
+suite.test('t.async() w/ node style callback', (t, done) => {
     
     function funcWithAsyncCallback(cb) {
         setTimeout(() => cb(undefined, 1), 100);

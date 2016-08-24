@@ -1,14 +1,10 @@
 'use strict';
 const Promise = require('bluebird');
-Promise.config({
-    warnings: true,
-    longStackTraces: true
-});
 const Suite = require('../lib/suite');
 
 const suite = new Suite('fail fast');
 
-suite.test('concurrent', (t, state, done) => {
+suite.test('concurrent', (t, done) => {
     const CopyOfSuite = Suite.getNewLibraryCopy();
     
     function SpyReporter(runner) {
@@ -40,7 +36,7 @@ suite.test('concurrent', (t, state, done) => {
     });
 });
 
-suite.test('serial', (t, state, done) => {
+suite.test('serial', (t, done) => {
     const CopyOfSuite = Suite.getNewLibraryCopy();
 
     function SpyReporter(runner) {

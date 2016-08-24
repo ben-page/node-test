@@ -1,9 +1,5 @@
 'use strict';
 const Promise = require('bluebird');
-Promise.config({
-    warnings: true,
-    longStackTraces: true
-});
 const Suite = require('../lib/suite');
 
 const suite = new Suite('timeout tests');
