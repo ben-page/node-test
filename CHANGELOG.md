@@ -1,3 +1,21 @@
+### 1.3.0
+- reduced public footprint using symbols
+- fixed callback hanging waiting for done
+- t.async can proxy callbacks or be the callback and supports count
+- long stack traces
+
+### 1.2.4
+- reenabled t.count
+
+### 1.2.3
+- updated not-so-shallow
+
+### 1.2.2
+- bug fixes
+
+### 1.2.1
+- bug fixes
+
 ### 1.2
 - removed suite.setTimeout() added suite.config()
 - changed t.count() back to t.async()
