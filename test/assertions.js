@@ -186,6 +186,13 @@ suite.test('t.throws() with test', t => {
     });
 });
 
+suite.test('t.throws() - with test callback', (t, done) => {
+    t.throws(done2 => {
+        done2();
+        done();
+    });
+});
+
 suite.test('t.throws() - with callback', t => {
     t.throws(done => {
         done();
@@ -197,6 +204,13 @@ suite.test('t.throws() - with callback error', t => {
         t.throws(done => {
             done(new Error('error'));
         });
+    });
+});
+
+suite.test('t.notThrows() - with test callback', (t, done) => {
+    t.notThrows(done2 => {
+        done2();
+        done();
     });
 });
 

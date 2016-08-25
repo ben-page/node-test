@@ -1,3 +1,6 @@
+### 1.3.1
+- fix throws/notThrows fn not running
+
 ### 1.3.0
 - reduced public footprint using symbols
 - fixed callback hanging waiting for done
