@@ -381,3 +381,11 @@ suite.test('t.async() - called too few times', t => {
 (err, t) => {
     t.true(err instanceof Promise.TimeoutError);
 });
+
+
+suite.test('promise reject non-error', t => {
+    return Promise.reject('string');
+},
+(err, t) => {
+    t.true(err.message === 'string');
+});
