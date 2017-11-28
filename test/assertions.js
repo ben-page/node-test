@@ -174,7 +174,7 @@ suite.test('t.throws() failures', t => {
     t.equal(err.message, 'Expected Error but none was thrown');
 });
 
-suite.only('t.throws() nested', t => {
+suite.test('t.throws() nested', t => {
     t.throws(() => {
         t.throws(() => {
             //no error, so first t.throws() asserts
@@ -226,14 +226,14 @@ suite.test('t.notThrows() synchronous', t => {
     });
 });
 
-suite.test('t.notThrows() failure', t => {
+suite.only('t.notThrows() failure', t => {
     t.notThrows(() => {
         t.equals(1, 2);
     });
-},
-(err, t) => {
-    t.equals(err.message, '1 === 2');
 });
+// (err, t) => {
+//     t.equals(err.message, '1 === 2');
+// });
 
 suite.test('t.notThrows() asynchronous', t => {
     t.notThrows(async () => {
