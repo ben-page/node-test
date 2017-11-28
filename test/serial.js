@@ -1,5 +1,4 @@
 'use strict';
-const Promise = require('bluebird');
 const Suite = require('../lib/suite');
 
 const suite = new Suite('asynchronous & serial');

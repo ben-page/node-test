@@ -1,6 +1,10 @@
 'use strict';
-const Promise = require('bluebird');
+process.on('unhandledRejection', err => {
+    console.error(err.stack);
+});
+
 const Suite = require('../lib/suite');
+const promise = require('../lib/promise');
 
 const suite = new Suite('Assertions Testing');
 suite.config({timeout: 1000});
@@ -154,21 +158,23 @@ suite.test('t.throws() synchronous', t => {
 });
 
 suite.test('t.throws() asynchronous', t => {
-    t.throws(() => {
-        return Promise.delay(100).return(Promise.reject(new Error('error')));
+    t.throws(async () => {
+        await promise.delay(100);
+        throw new Error('error');
     });
 });
 
 suite.test('t.throws() failures', t => {
-    t.throws(() => {
-        return Promise.delay(100).return(Promise.resolve(true));
+    t.throws(async () => {
+        await promise.delay(100);
+        return true;
     });
 },
 (err, t) => {
     t.equal(err.message, 'Expected Error but none was thrown');
 });
 
-suite.test('t.throws() nested', t => {
+suite.only('t.throws() nested', t => {
     t.throws(() => {
         t.throws(() => {
             //no error, so first t.throws() asserts
@@ -230,8 +236,9 @@ suite.test('t.notThrows() failure', t => {
 });
 
 suite.test('t.notThrows() asynchronous', t => {
-    t.notThrows(() => {
-        return Promise.delay(100).return(Promise.resolve(true));
+    t.notThrows(async () => {
+        await promise.delay(100);
+        return true;
     });
 });
 
