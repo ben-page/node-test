@@ -9,6 +9,14 @@ const promise = require('../lib/promise');
 const suite = new Suite('Assertions Testing');
 suite.config({timeout: 1000});
 
+suite.only('uncaught', t => {
+    // setTimeout(() => {
+        setTimeout(() => {
+            throw new Error('err');
+        }, 100);
+    // }, 100);
+});
+
 suite.test('t.is()', t => {
     t.is(1, 1);
     t.throws(() => {
@@ -333,7 +341,7 @@ suite.test('t.throws() is sync, but test error func is async', async t => {
     t.equals(err.message, 'threw 2');
 });
 
-suite.only('t.async()', (t, done) => {
+suite.test('t.async()', (t, done) => {
     setTimeout(t.async(() => {
         t.pass();
         done();
