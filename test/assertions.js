@@ -157,15 +157,15 @@ suite.test('t.throws() synchronous', t => {
     });
 });
 
-suite.test('t.throws() asynchronous', t => {
-    t.throws(async () => {
+suite.test('t.throws() asynchronous', async t => {
+    await t.throws(async () => {
         await promise.delay(100);
         throw new Error('error');
     });
 });
 
-suite.test('t.throws() failures', t => {
-    t.throws(async () => {
+suite.test('t.throws() failures', async t => {
+    await t.throws(async () => {
         await promise.delay(100);
         return true;
     });
@@ -205,16 +205,16 @@ suite.test('t.throws() - with callback', t => {
     });
 });
 
-suite.test('t.throws() - with callback error', t => {
-    t.throws(() => {
-        t.throws(done => {
+suite.test('t.throws() - with callback error', async t => {
+    await t.throws(async () => {
+        await t.throws(async done => {
             done(new Error('error'));
         });
     });
 });
 
-suite.test('t.notThrows() - with test callback', (t, done) => {
-    t.notThrows(done2 => {
+suite.test('t.notThrows() - with test callback', async (t, done) => {
+    await t.notThrows(done2 => {
         done2();
         done();
     });
@@ -226,17 +226,17 @@ suite.test('t.notThrows() synchronous', t => {
     });
 });
 
-suite.only('t.notThrows() failure', t => {
+suite.test('t.notThrows() failure', t => {
     t.notThrows(() => {
         t.equals(1, 2);
     });
+},
+(err, t) => {
+    t.equals(err.message, '1 === 2');
 });
-// (err, t) => {
-//     t.equals(err.message, '1 === 2');
-// });
 
-suite.test('t.notThrows() asynchronous', t => {
-    t.notThrows(async () => {
+suite.test('t.notThrows() asynchronous', async t => {
+    await t.notThrows(async () => {
         await promise.delay(100);
         return true;
     });
@@ -254,7 +254,6 @@ suite.test('t.notThrows() nested', t => {
 });
 
 suite.test('t.noError()', t => {
-
     function callbackWithError(cb) {
         cb(new Error());
     }
@@ -289,8 +288,8 @@ suite.test('t.throws(Promise.resolve())', t => {
     t.equals(err.message, 'expected to throw');
 });
 
-suite.test('t.throws(Promise.reject())', t => {
-    t.throws(() => {
+suite.test('t.throws(Promise.reject())', async t => {
+    await t.throws(() => {
         return Promise.reject(new Error('threw'));
     },
     err => {
@@ -298,32 +297,32 @@ suite.test('t.throws(Promise.reject())', t => {
     });
 });
 
-suite.test('t.throws() throw in test error func', t => {
-    t.throws(() => {
-        return Promise.reject(new Error('threw'));
+suite.test('t.throws() throw in test error func', async t => {
+    await t.throws(() => {
+        return Promise.reject(new Error('expected'));
     },
     err => {
-        t.equals(err.message, 'threw 2');
+        t.equals(err.message, 'unexpected');
     });
 },
 (err, t) => {
-    t.equals(err.message, '\'threw\' === \'threw 2\'');
+    t.equals(err.message, '\'expected\' === \'unexpected\'');
 });
 
-suite.test('t.throws() promise in test error func', t => {
-    t.throws(() => {
-        return Promise.reject(new Error('threw'));
-    },
-    err => {
-        return Promise.reject(new Error('threw 2'));
-    });
+suite.test('t.throws() promise in test error func', async t => {
+    await t.throws(() => {
+            return Promise.reject(new Error('threw'));
+        },
+        err => {
+            return Promise.reject(new Error('threw 2'));
+        });
 },
 (err, t) => {
     t.equals(err.message, 'threw 2');
 });
 
-suite.test('t.throws() is sync, but test error func is async', t => {
-    t.throws(() => {
+suite.test('t.throws() is sync, but test error func is async', async t => {
+    await t.throws(() => {
         throw new Error('threw');
     },
     err => {
@@ -334,7 +333,7 @@ suite.test('t.throws() is sync, but test error func is async', t => {
     t.equals(err.message, 'threw 2');
 });
 
-suite.test('t.async()', (t, done) => {
+suite.only('t.async()', (t, done) => {
     setTimeout(t.async(() => {
         t.pass();
         done();

@@ -467,16 +467,16 @@ t.notThrows(done => {
 });
 ```
 
-#### `t.throws(fn, [errTestFn], [message])`
+#### `t.throws(fn, [validateError], [message])`
 An assertion that `fn` is function that either throws an Error synchronously or asynchronously (via Promise or callback).
 ###### Arguments
 - `fn`: function([done]) - code to assert throws
   - (optional) `done`: function - callback for asynchronous test
-  - `validateError`: function - function to validate the error
+- `validateError`: function - function to validate the error
 
 Except for the `validateError` argument, this functions as the opposite of `t.notThrow()`. That is `throws` passes when there is an Error rather passing when there is no Error. For more usage details, look at the `notThrows` examples.
 
-Passing `errTestFn` allows testing that the Error received is the Error expected.
+Passing `validateError` allows testing that the Error received is the Error expected.
 ```js
 t.throws(() => {
     return funcReturnsPromise();
@@ -488,7 +488,7 @@ err => {
 ```
 
 ### `t.async([fn], [count])`
-An assertion that wraps any asynchronous functions so the test awaits the function being called and ensures asynchronous errors are caught. `t.async` makes it easy to waiting on asynchronous callbacks.
+An assertion that wraps any asynchronous functions so the test awaits the function being called and ensures asynchronous errors are caught. `t.async` makes it easy to wait on asynchronous callbacks.
 
 ###### Arguments
 - `fn`: function (optional) - counting function
@@ -538,7 +538,7 @@ There are couple ways to run multiple suites.
     suite3.js
     ```
     
-    Then, createcreate a file named`index.js` with these contents:
+    Then, create a file named `index.js` like this:
     ```js
     'use strict';
     require('./suite1');
@@ -553,11 +553,14 @@ There are couple ways to run multiple suites.
     }
     ```
     
-    Now you can run individual suites or the whole thing from the command line.
+    Now you can run individual suites from the command line.
     ```shell
-    node tests/suite1.js
-    node tests/index.js
-    npm test
+    > node tests/suite1.js
+    > node tests/suite3.js
+    ```
+    Or you can run the whole thing.
+    ```shell
+    > npm test
     ```
 3. The up coming CLI will make it easier to execute multiple suites without needing to maintain an `index.js`.
 
