@@ -1,7 +1,7 @@
 'use strict';
-process.on('unhandledRejection', err => {
-    console.error(err.stack);
-});
+// process.on('unhandledRejection', err => {
+//     console.error(err.stack);
+// });
 
 const Suite = require('../lib/suite');
 const promise = require('../lib/promise');
