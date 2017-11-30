@@ -1,5 +1,5 @@
 'use strict';
-const Suite = require('../lib/suite');
+const Suite = require('../lib/Suite');
 
 new Suite('Todo, Skip')
     .test('t.is()', t => {

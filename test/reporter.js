@@ -1,5 +1,5 @@
 'use strict';
-const Suite = require('../lib/suite');
+const Suite = require('../lib/Suite');
 const Reporter = require('../lib/reporter');
 Suite.addReporter(Reporter);
 Suite.addReporter(SpyReporter);

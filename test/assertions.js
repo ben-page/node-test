@@ -3,24 +3,24 @@
 //     console.error(err.stack);
 // });
 
-const Suite = require('../lib/suite');
+const Suite = require('../lib/Suite');
 const promise = require('../lib/promise');
 
 const suite = new Suite('Assertions Testing');
 suite.config({timeout: 1000});
 
 suite.only('uncaught', t => {
-    // setTimeout(() => {
+    setTimeout(() => {
         setTimeout(() => {
-            throw new Error('err');
-        }, 100);
-    // }, 100);
+            throw new Error('uncaught error');
+        }, 3000);
+    }, 100);
 });
 
-suite.only('reject', t => {
+suite.test('reject', t => {
     return t.notThrows(done => {
         setTimeout(() => {
-            done(new Error('err'));
+            done(new Error('rejected'));
         }, 100);
     });
 });
