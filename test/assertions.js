@@ -17,6 +17,14 @@ suite.only('uncaught', t => {
     // }, 100);
 });
 
+suite.only('reject', t => {
+    return t.notThrows(done => {
+        setTimeout(() => {
+            done(new Error('err'));
+        }, 100);
+    });
+});
+
 suite.test('t.is()', t => {
     t.is(1, 1);
     t.throws(() => {
