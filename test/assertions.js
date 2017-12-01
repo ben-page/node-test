@@ -13,11 +13,11 @@ suite.only('uncaught', t => {
     setTimeout(() => {
         setTimeout(() => {
             throw new Error('uncaught error');
-        }, 3000);
+        }, 100);
     }, 100);
 });
 
-suite.test('reject', t => {
+suite.only('reject', t => {
     return t.notThrows(done => {
         setTimeout(() => {
             done(new Error('rejected'));
