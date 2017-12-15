@@ -330,18 +330,19 @@ err => {
     t.equal(err.message, 'count exceeded');
 });
 
-suite.only('t.count() - called too few times', async () => {
+suite.test('t.count() - called too few times', async () => {
     await t.count(cb => {
         cb();
         cb();
     }, 3);
 },
 err => {
-    t.true(err instanceof Promise.TimeoutError);
+    t.true(err instanceof promise.PromiseTimeoutError);
 });
 
 
-suite.test('promise reject non-error', async () => {
+suite.test('promise reject non-error', () => {
+// eslint-disable-next-line no-throw-literal
     throw 'string';
 },
 err => {
