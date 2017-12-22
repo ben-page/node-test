@@ -14,14 +14,14 @@ let start = 0,
 const tests = [];
 
 function SpyReporter(runner) {
-    runner.on('start', root => {
+    runner.on('start', roo() => {
         if (++start !== 1)
             throw new Error(`expected start event 1 times, but got it ${start} times`);
     
         expectedSuites = root.suites.length;
     });
     
-    runner.on('testEnd', test => {
+    runner.on('testEnd', tes() => {
         testEnd++;
         if (tests.indexOf(test) > -1)
             throw new Error(`testEnd called twice for test ${test.name}`);

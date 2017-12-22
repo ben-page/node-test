@@ -2,24 +2,24 @@
 const Suite = require('../lib/Suite');
 
 new Suite('Todo, Skip')
-    .test('t.is()', t => {
+    .test('t.is()', () => {
         t.pass();
     })
     
-    .todo('something todo', t => {
+    .todo('something todo', () => {
         t.fail('should not run');
     })
     
     .todo('something todo 2')
 
-    .skip('skipped', t => {
+    .skip('skipped', () => {
         t.fail('should not run');
     })
     
-    .test('pass 1', t => {
+    .test('pass 1', () => {
         t.notEquals(1, 2);
     });
     
-    // .test('fail', t => {
+    // .test('fail', () => {
     //     t.equals(1, 2);
     // });

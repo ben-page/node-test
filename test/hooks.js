@@ -5,7 +5,7 @@ const suite = new Suite('beforeEach & afterEach');
 
 let one, two;
 
-suite.beforeEach(t => {
+suite.beforeEach(() => {
     return { init: true };
 });
 
@@ -27,7 +27,7 @@ suite.test('second', (t, state) => {
     state.start = true;
 });
 
-suite.after(t => {
+suite.after(() => {
     t.equal(one.init, true);
     t.equal(one.start, true);
     t.equal(one.complete, true);

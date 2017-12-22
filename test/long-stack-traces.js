@@ -31,7 +31,7 @@ From previous event:
     at suite.test (C:\\projects\\node-test\\test\\long-stack-traces.js:20:13)`);
 });
 
-suite.test('promises', t => {
+suite.test('promises', () => {
     function thing3() {
         return Promise.resolve()
             .then(() => {

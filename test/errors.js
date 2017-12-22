@@ -1,9 +1,10 @@
 'use strict';
 const Suite = require('../lib/Suite');
+const t = require('../lib/assert');
 
 const suite = new Suite('errors');
 
-suite.test('error message', t => {
+suite.test('error message', () => {
     t.throws(() => {
         t.equal(1, 2, 'not equal!');
     },
@@ -14,7 +15,7 @@ suite.test('error message', t => {
     });
 });
 
-suite.test('no error message', t => {
+suite.test('no error message', () => {
     t.throws(() => {
         t.equal(1, 2);
     },
@@ -24,7 +25,7 @@ suite.test('no error message', t => {
     });
 });
 
-suite.test('validation fail()', t => {
+suite.test('validation fail()', () => {
     t.throws(() => {
         t.fail(1);
     },
@@ -33,7 +34,7 @@ suite.test('validation fail()', t => {
     });
 });
 
-suite.test('validation true()', t => {
+suite.test('validation true()', () => {
     t.throws(() => {
         t.true(1);
     },
@@ -42,7 +43,7 @@ suite.test('validation true()', t => {
     });
 });
 
-suite.test('validation true()', t => {
+suite.test('validation true()', () => {
     t.throws(() => {
         t.true(true, 1);
     },
@@ -51,7 +52,7 @@ suite.test('validation true()', t => {
     });
 });
 
-suite.test('validation false()', t => {
+suite.test('validation false()', () => {
     t.throws(() => {
         t.false(1);
     },
@@ -60,7 +61,7 @@ suite.test('validation false()', t => {
     });
 });
 
-suite.test('validation false()', t => {
+suite.test('validation false()', () => {
     t.throws(() => {
         t.false(true, 1);
     },
@@ -69,7 +70,7 @@ suite.test('validation false()', t => {
     });
 });
 
-suite.test('validation truthy()', t => {
+suite.test('validation truthy()', () => {
     t.throws(() => {
         t.truthy(true, 1);
     },
@@ -78,7 +79,7 @@ suite.test('validation truthy()', t => {
     });
 });
 
-suite.test('validation assert()', t => {
+suite.test('validation assert()', () => {
     t.throws(() => {
         t.assert(true, 1);
     },
@@ -87,7 +88,7 @@ suite.test('validation assert()', t => {
     });
 });
 
-suite.test('validation falsey()', t => {
+suite.test('validation falsey()', () => {
     t.throws(() => {
         t.falsey(true, 1);
     },
@@ -96,7 +97,7 @@ suite.test('validation falsey()', t => {
     });
 });
 
-suite.test('validation equal()', t => {
+suite.test('validation equal()', () => {
     t.throws(() => {
         t.equal(true, false, 1);
     },
@@ -105,7 +106,7 @@ suite.test('validation equal()', t => {
     });
 });
 
-suite.test('validation equals()', t => {
+suite.test('validation equals()', () => {
     t.throws(() => {
         t.equals(true, false, 1);
     },
@@ -114,7 +115,7 @@ suite.test('validation equals()', t => {
     });
 });
 
-suite.test('validation is()', t => {
+suite.test('validation is()', () => {
     t.throws(() => {
         t.is(true, false, 1);
     },
@@ -123,7 +124,7 @@ suite.test('validation is()', t => {
     });
 });
 
-suite.test('validation notEqual()', t => {
+suite.test('validation notEqual()', () => {
     t.throws(() => {
         t.notEqual(true, false, 1);
     },
@@ -132,7 +133,7 @@ suite.test('validation notEqual()', t => {
     });
 });
 
-suite.test('validation not()', t => {
+suite.test('validation not()', () => {
     t.throws(() => {
         t.not(true, false, 1);
     },
@@ -141,7 +142,7 @@ suite.test('validation not()', t => {
     });
 });
 
-suite.test('validation notEquals()', t => {
+suite.test('validation notEquals()', () => {
     t.throws(() => {
         t.notEquals(true, false, 1);
     },
@@ -150,7 +151,7 @@ suite.test('validation notEquals()', t => {
     });
 });
 
-suite.test('validation deepEqual()', t => {
+suite.test('validation deepEqual()', () => {
     t.throws(() => {
         t.deepEqual(true, false, 1);
     },
@@ -159,7 +160,7 @@ suite.test('validation deepEqual()', t => {
     });
 });
 
-suite.test('validation notDeepEqual()', t => {
+suite.test('validation notDeepEqual()', () => {
     t.throws(() => {
         t.notDeepEqual(true, false, 1);
     },
@@ -168,7 +169,7 @@ suite.test('validation notDeepEqual()', t => {
     });
 });
 
-suite.test('validation greaterThan()', t => {
+suite.test('validation greaterThan()', () => {
     t.throws(() => {
         t.greaterThan(true, false, 1);
     },
@@ -177,7 +178,7 @@ suite.test('validation greaterThan()', t => {
     });
 });
 
-suite.test('validation greaterThanOrEqual()', t => {
+suite.test('validation greaterThanOrEqual()', () => {
     t.throws(() => {
         t.greaterThanOrEqual(true, false, 1);
     },
@@ -186,7 +187,7 @@ suite.test('validation greaterThanOrEqual()', t => {
     });
 });
 
-suite.test('validation lessThan()', t => {
+suite.test('validation lessThan()', () => {
     t.throws(() => {
         t.lessThan(true, false, 1);
     },
@@ -195,7 +196,7 @@ suite.test('validation lessThan()', t => {
     });
 });
 
-suite.test('validation lessThanOrEqual()', t => {
+suite.test('validation lessThanOrEqual()', () => {
     t.throws(() => {
         t.lessThanOrEqual(true, false, 1);
     },
@@ -204,7 +205,7 @@ suite.test('validation lessThanOrEqual()', t => {
     });
 });
 
-suite.test('validation noError()', t => {
+suite.test('validation noError()', () => {
     t.throws(() => {
         t.noError(true, 1);
     },
@@ -213,23 +214,23 @@ suite.test('validation noError()', t => {
     });
 });
 
-suite.test('validation throws()', t => {
+suite.test('validation throws()', () => {
     t.throws(() => {
         t.throws();
     },
     err => {
         t.equal(err.message, 'argument 1 \'fn\' should be a function');
     });
-    
+
     t.throws(() => {
         t.throws((a,b,c) => {});
     },
     err => {
         t.equal(err.message, 'argument 1 \'fn\' should be a function with 0 or 1 argument');
     });
-    
+
     t.throws(() => {
-        t.throws(()=>{}, 1);
+        t.throws(() => {}, 1);
     },
     err => {
         t.equal(err.message, 'argument 2 should be a function or string');
@@ -243,64 +244,19 @@ suite.test('validation throws()', t => {
     });
 });
 
-suite.test('validation notThrows()', t => {
+suite.test('validation count()', () => {
     t.throws(() => {
-        t.notThrows();
+        t.count(1);
     },
     err => {
         t.equal(err.message, 'argument 1 \'fn\' should be a function');
     });
     
     t.throws(() => {
-        t.notThrows((a,b,c) => {});
-    },
-    err => {
-        t.equal(err.message, 'argument 1 \'fn\' should be a function with 0 or 1 argument');
-    });
-    
-    t.throws(() => {
-        t.notThrows(() => {}, 1);
-    },
-    err => {
-        t.equal(err.message, 'argument 2 \'message\' should be a string');
-    });
-});
-
-suite.test('validation async()', t => {
-    t.throws(() => {
-        t.async(1, 2, 3);
-    },
-    err => {
-        t.equal(err.message, 'expected between 0 and 2 arguments');
-    });
-    
-    t.throws(() => {
-        t.async('test');
-    },
-    err => {
-        t.equal(err.message, 'argument 1 should be a function or number');
-    });
-    
-    t.throws(() => {
-        t.async((a) => {
+        t.count((a) => {
         }, 0);
     },
     err => {
-        t.equal(err.message, 'argument 2 \'count\' should be a whole number greater than 0');
-    });
-    
-    t.throws(() => {
-        t.async(1, 1);
-    },
-    err => {
-        t.equal(err.message, 'unexpected argument 2');
-    });
-    
-    t.throws(() => {
-        t.async((a) => {
-        }, 5.5);
-    },
-    err => {
-        t.equal(err.message, 'argument 2 \'count\' should be a whole number greater than 0');
+        t.equal(err.message, 'argument 2 \'count\' should be a number greater than 0');
     });
 });
