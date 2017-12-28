@@ -1,5 +1,6 @@
 'use strict';
 const Suite = require('../lib/Suite');
+const t = require('../lib/assert');
 
 const suite = new Suite('Testing suite level hooks');
 

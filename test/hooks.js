@@ -1,7 +1,9 @@
 'use strict';
 const Suite = require('../lib/Suite');
+const t = require('../lib/assert');
 
 const suite = new Suite('beforeEach & afterEach');
+suite.config({timeout: 100000});
 
 let one, two;
 
@@ -9,18 +11,18 @@ suite.beforeEach(() => {
     return { init: true };
 });
 
-suite.afterEach((t, state) => {
+suite.afterEach(state => {
     state.complete = true;
 });
 
-suite.test('first', (t, state) => {
+suite.serial.test('first', state => {
     t.equal(state.init, true);
     t.falsey(state.complete);
     one = state;
     state.start = true;
 });
 
-suite.test('second', (t, state) => {
+suite.serial.test('second', state => {
     t.equal(state.init, true);
     t.falsey(state.complete);
     two = state;

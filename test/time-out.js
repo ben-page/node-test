@@ -1,20 +1,18 @@
 'use strict';
 const Suite = require('../lib/Suite');
+const t = require('../lib/assert');
+const promise = require('../lib/promise');
 
 const suite = new Suite('timeout tests');
 suite.config({ timeout: 1000 });
 
 suite.test('no time out', () => {
-    t.notThrows(() => {
-        return Promise.delay(800);
-    });
+    return promise.delay(800);
 });
 
 suite.test('timed out', () => {
-    t.notThrows(() => {
-        return Promise.delay(1200);
-    });
+    return promise.delay(1200);
 },
-(err, t) => {
-    t.true(err instanceof Promise.TimeoutError);
+err => {
+    t.true(err instanceof promise.PromiseTimeoutError);
 });
