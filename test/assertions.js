@@ -169,18 +169,18 @@ suite.test('uncaught error', () => {
     }, 100);
 },
 err => {
-    t.equals(err.message, 'uncaught');
+    t.equals(err.message, '[Uncaught Exception] uncaught');
 });
 
 suite.test('uncaught rejection', () => {
-    return new Promise((resolve, reject) => {
+    new Promise((resolve, reject) => {
         setTimeout(() => {
             reject(new Error('uncaught'));
         }, 100);
     });
 },
 err => {
-    t.equals(err.message, 'uncaught');
+    t.equals(err.message, '[Unhandled Rejection] uncaught');
 });
 
 suite.test('uncaught rejection 2', () => {
@@ -191,7 +191,7 @@ suite.test('uncaught rejection 2', () => {
     }, 100);
 },
 err => {
-    t.equals(err.message, 'uncaught');
+    t.equals(err.message, '[Unhandled Rejection] uncaught');
 });
 
 suite.test('t.count()', async () => {
