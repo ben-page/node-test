@@ -3,7 +3,6 @@ const Suite = require('../lib/Suite');
 const t = require('../lib/assert');
 
 const suite = new Suite('beforeEach & afterEach');
-suite.config({timeout: 100000});
 
 let one, two;
 
