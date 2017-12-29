@@ -16,7 +16,7 @@ module.exports = {
         'no-console': 'off',
         'no-extra-parens': ['warn', 'functions'],
         'no-template-curly-in-string': 'error',
-        
+
         //Best Practices
         'accessor-pairs': 'error',
         'array-callback-return': 'error',
@@ -65,10 +65,10 @@ module.exports = {
         'prefer-promise-reject-errors': 'error',
         'require-await': 'error',
         'yoda': ['error', 'never'],
-        
+
         //Strict Mode
-        'strict': ['error', 'global'],
-        
+        'strict': ['error', 'safe'],
+
         //Variables
         'no-catch-shadow': 'error',
         'no-label-var': 'error',
@@ -77,8 +77,8 @@ module.exports = {
         'no-undef': 'error',
         'no-undef-init': 'error',
         'no-unused-vars': ['error', {args: 'none'}],
-        'no-use-before-define': ['error', {'functions': false, 'classes': false }],
-        
+        'no-use-before-define': ['error', {'functions': false, 'classes': false}],
+
         //Node.js and CommonJS
         'no-mixed-requires': 'error',
         'no-new-require': 'error',
@@ -86,7 +86,7 @@ module.exports = {
         'no-process-exit': 'error',
         'no-restricted-modules': 'error',
         'no-sync': "error",
-        
+
         //Stylistic Issues
         'array-bracket-newline': ['warn', {'multiline': true}],
         'array-bracket-spacing': ['warn', 'never', {'arraysInArrays': true}],
@@ -105,22 +105,22 @@ module.exports = {
         'indent': ['warn', 4, {SwitchCase: 1}],
         'key-spacing': ['warn', {beforeColon: false, afterColon: true}],
         'linebreak-style': ['warn', 'unix'],
-        'lines-around-comment': ['warn', { 'beforeBlockComment': true }],
+        'lines-around-comment': ['warn', {'beforeBlockComment': true}],
         'max-statements-per-line': 'warn',
         'new-cap': ['warn', {'newIsCap': true, 'properties': true}],
         'new-parens': 'warn',
-        'newline-per-chained-call': ['warn', { 'ignoreChainWithDepth': 3 }],
+        'newline-per-chained-call': ['warn', {'ignoreChainWithDepth': 3}],
         'no-array-constructor': 'warn',
         'no-lonely-if': 'warn',
-        'no-multiple-empty-lines': ['warn', { 'max': 2, 'maxBOF': 0, 'maxEOF': 1 }],
+        'no-multiple-empty-lines': ['warn', {'max': 2, 'maxBOF': 0, 'maxEOF': 1}],
         'no-new-object': 'warn',
-        'no-trailing-spaces': ['warn', { 'skipBlankLines': true }],
+        'no-trailing-spaces': ['warn', {'skipBlankLines': true}],
         'no-unneeded-ternary': 'warn',
         'no-whitespace-before-property': 'error',
         'nonblock-statement-body-position': ['warn', 'below'],
-        'object-curly-newline': ['warn', { 'multiline': true, 'consistent': true }],
+        'object-curly-newline': ['warn', {'multiline': true, 'consistent': true}],
         // 'object-curly-spacing': ['warn', 'never', { 'arraysInObjects': false, 'objectsInObjects': true }],
-        'quotes': ['warn', 'single'],
+        'quotes': ['warn', 'single', {"allowTemplateLiterals": true}],
         'semi': ['warn', 'always'],
         'semi-style': ['warn', 'last'],
         'semi-spacing': 'warn',
@@ -130,7 +130,7 @@ module.exports = {
         'space-infix-ops': ['warn', {'int32Hint': false}],
         'space-unary-ops': 'warn',
         'switch-colon-spacing': ['warn', {'after': true, 'before': false}],
-        
+
         //ECMAScript 6
         'arrow-body-style': ['warn', 'as-needed'],
         'arrow-parens': ['warn', 'as-needed'],
@@ -140,7 +140,7 @@ module.exports = {
         'no-duplicate-imports': 'error',
         'no-useless-computed-key': 'error',
         'no-var': 'error',
-        'object-shorthand': ['warn', 'always', { 'avoidQuotes': true }],
+        'object-shorthand': ['warn', 'always', {'avoidQuotes': true}],
         'prefer-arrow-callback': 'warn',
         'prefer-const': ['error', {'destructuring': 'all'}],
         'prefer-numeric-literals': 'error',

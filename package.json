@@ -5,19 +5,17 @@
   "license": "MIT",
   "homepage": "https://github.com/ben-page/node-test",
   "author": "Ben Page <ben.page@openreign.com>",
-  "main": "lib/suite.js",
+  "main": "lib/Suite.js",
   "repository": "ben-page/node-test",
   "engines": {
-    "node": ">=8.0.0"
+    "node": ">=9.0.0"
   },
   "scripts": {
     "test": "test/test.js"
   },
   "dependencies": {
     "chalk": "^1.1.3",
-    "clarify": "^2.0.0",
-    "not-so-shallow": "^0.1.4",
-    "trace": "^3.0.0"
+    "not-so-shallow": "^0.1.4"
   },
   "devDependencies": {}
 }
