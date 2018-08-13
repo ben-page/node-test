@@ -26,18 +26,20 @@ suite.test('concurrent', done => {
     CopyOfSuite.addReporter(SpyReporter);
 
     const innerSuite = new CopyOfSuite('fail fast');
+// const innerSuite = suite;
     innerSuite.config({failFast: true, timeout: -1});
 
     innerSuite.test('pass', () => {
         t.equal(1, 1);
     });
 
-    innerSuite.test('fail', () => {
+    innerSuite.test('fail', async () => {
+        await promise.delay(500);
         t.fail();
     });
 
     innerSuite.test('stop', () => {
-        return promise.delay(100)
+        return promise.delay(50000)
             .then(() => {
                 t.equal(1, 1);
             });
